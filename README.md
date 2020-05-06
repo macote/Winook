@@ -4,7 +4,7 @@ Winook is a Windows library that let you install thread-level hooks inside proce
 
 # Information
 
-Winhook uses dll injection and a host process to setup hooks.
+Winook uses dll injection and a host process to setup hooks.
 
 # Usage
 
