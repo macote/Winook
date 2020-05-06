@@ -1,6 +1,5 @@
 // Microsoft Visual C++ generated resource script.
 //
-#include "Resource.h"
 #include "Windows.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -9,22 +8,6 @@
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Icon
-//
-
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
-IDI_ICON                ICON                    "Winook.Lib.Host.ico"
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// RT_MANIFEST
-//
-
-CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST             "application.manifest"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -48,10 +31,10 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "FileDescription", "Winook library host application."
+            VALUE "FileDescription", "Winook library to install hooks."
             VALUE "FileVersion", "0.1.0.0"
             VALUE "LegalCopyright", "Marc-André Côté"
-            VALUE "ProductName", "Winook Library Host"
+            VALUE "ProductName", "Winook Library"
             VALUE "ProductVersion", "0.1.0"
         END
     END

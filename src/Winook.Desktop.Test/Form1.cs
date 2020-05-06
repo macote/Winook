@@ -30,7 +30,7 @@
         {
             label1.Invoke((MethodInvoker)delegate
             {
-                label1.Text = $"Mouse Message Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}";
+                label1.Text = $"Mouse Message Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}";
             });
         }
     }

@@ -21,7 +21,7 @@
         #region Fields
 
         private const int MsgCodeMouseLeftButtonUp = 0x0202; // WM_LBUTTONUP
-        private const int MouseHookMessageSizeInBytes = 20;
+        private const int MouseHookMessageSizeInBytes = 24;
         private const string LibHostExeBaseName = "winook\\Winook.Lib.Host";
 
         private Process _targetProcess;
@@ -146,9 +146,10 @@
                 Y = BitConverter.ToInt32(e.Bytes, 8),
                 Handle = BitConverter.ToInt32(e.Bytes, 12),
                 HitTestCode = BitConverter.ToInt32(e.Bytes, 16),
+                Delta = BitConverter.ToInt16(e.Bytes, 20),
             };
 
-            Debug.WriteLine($"Mouse Message Code: {eventArgs.MessageCode}; X: {eventArgs.X}; Y: {eventArgs.Y}");
+            Debug.WriteLine($"Mouse Message Code: {eventArgs.MessageCode}; X: {eventArgs.X}; Y: {eventArgs.Y}; Delta: {eventArgs.Delta}");
 
             if (eventArgs.MessageCode == MsgCodeMouseLeftButtonUp)
             {
@@ -168,5 +169,6 @@
         public int Y;
         public int Handle;
         public int HitTestCode;
+        public short Delta;
     }
 }

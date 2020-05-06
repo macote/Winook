@@ -14,6 +14,7 @@ struct HookMouseMessage
     DWORD pointY;
     DWORD hwnd;
     DWORD hitTestCode;
+    DWORD zDelta;
 };
 
 struct HookKeyboardMessage

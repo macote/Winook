@@ -106,13 +106,27 @@ LRESULT CALLBACK MouseHookProc(int code, WPARAM wParam, LPARAM lParam)
 #endif
     if (code == HC_ACTION)
     {
-        auto pmhs = (PMOUSEHOOKSTRUCT)lParam;
         HookMouseMessage hmm;
         hmm.messageCode = (DWORD)wParam;
-        hmm.pointX = pmhs->pt.x;
-        hmm.pointY = pmhs->pt.y;
-        hmm.hwnd = (DWORD)PtrToInt(pmhs->hwnd);
-        hmm.hitTestCode = (DWORD)pmhs->wHitTestCode;
+        if (wParam == WM_MOUSEWHEEL)
+        {
+            auto pmhsx = (PMOUSEHOOKSTRUCTEX)lParam;
+            hmm.pointX = pmhsx->pt.x;
+            hmm.pointY = pmhsx->pt.y;
+            hmm.hwnd = (DWORD)PtrToInt(pmhsx->hwnd);
+            hmm.hitTestCode = (DWORD)pmhsx->wHitTestCode;
+            hmm.zDelta = HIWORD(pmhsx->mouseData);
+        }
+        else
+        {
+            auto pmhs = (PMOUSEHOOKSTRUCT)lParam;
+            hmm.pointX = pmhs->pt.x;
+            hmm.pointY = pmhs->pt.y;
+            hmm.hwnd = (DWORD)PtrToInt(pmhs->hwnd);
+            hmm.hitTestCode = (DWORD)pmhs->wHitTestCode;
+            hmm.zDelta = 0;
+        }
+
         messagesender.SendMessage(&hmm, sizeof(HookMouseMessage));
     }
 
