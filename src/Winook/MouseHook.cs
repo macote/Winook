@@ -10,19 +10,11 @@
 
     public class MouseHook : IDisposable
     {
-        #region Imports
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool IsWow64Process([In] IntPtr process, out bool wow64Process);
-
-        #endregion
-
         #region Fields
 
         private const int MsgCodeMouseLeftButtonUp = 0x0202; // WM_LBUTTONUP
         private const int MouseHookMessageSizeInBytes = 24;
-        private const string LibHostExeBaseName = "winook\\Winook.Lib.Host";
+        private const string LibHostExeBaseName = "winook.support\\Winook.Lib.Host";
 
         private Process _targetProcess;
         private Process _libHostProcess;
@@ -78,7 +70,11 @@
             _messageReceiver.Stop();
         }
 
-        public void Dispose() => this.Dispose(true);
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
         protected virtual void Dispose(bool disposing)
         {
@@ -86,19 +82,9 @@
             {
                 if (disposing)
                 {
-                    try
-                    {
-                        ReleaseAndDisposeMutex();
-                        if (_libHostProcess != null)
-                        {
-                            _libHostProcess.Dispose();
-                        }
-
-                        _messageReceiver.Dispose();
-                    }
-                    catch
-                    {
-                    }
+                    ReleaseAndDisposeMutex();
+                    _libHostProcess?.Dispose();
+                    _messageReceiver.Dispose();
                 }
 
                 _disposed = true;
@@ -111,7 +97,7 @@
             {
                 return false;
             }
-            if (!IsWow64Process(process.Handle, out bool wow64Process))
+            if (!NativeMethods.IsWow64Process(process.Handle, out bool wow64Process))
             {
                 throw new Win32Exception();
             }
@@ -125,10 +111,11 @@
             {
                 _libHostMutex.ReleaseMutex(); // Let exe unhook and terminate
                 _libHostMutex.Dispose();
+                _libHostMutex = null;
             }
         }
 
-        private string GetExecutingAssemblyDirectory()
+        private static string GetExecutingAssemblyDirectory()
         {
             var codeBase = Assembly.GetExecutingAssembly().CodeBase;
             var uri = new UriBuilder(codeBase);
@@ -153,7 +140,7 @@
 
             if (eventArgs.MessageCode == MsgCodeMouseLeftButtonUp)
             {
-                this.MouseLeftButtonUp?.Invoke(this, eventArgs);
+                MouseLeftButtonUp?.Invoke(this, eventArgs);
             }
 
             MouseMessageReceived?.Invoke(this, eventArgs);
@@ -162,6 +149,7 @@
         #endregion
     }
 
+#pragma warning disable CA1051 // Do not declare visible instance fields
     public class MouseMessageEventArgs : EventArgs
     {
         public int MessageCode;
@@ -171,4 +159,5 @@
         public int HitTestCode;
         public short Delta;
     }
+#pragma warning restore CA1051 // Do not declare visible instance fields
 }

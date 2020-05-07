@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Winook", "src\Winook\Winook.csproj", "{E3CFD63F-FD2F-40F2-BF99-E072326074EF}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1464C5EF-06A7-45E9-948E-AF7F17D5C397}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
@@ -16,6 +14,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Winook.Lib", "src\Winook.Li
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Winook.Lib.Host", "src\Winook.Lib.Host\Winook.Lib.Host.vcxproj", "{69306344-BD77-4AF6-8890-BF001D8EA7EE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Winook", "src\Winook\Winook.csproj", "{E5984E13-442B-4833-AF21-A704B67A99AB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,18 +26,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E3CFD63F-FD2F-40F2-BF99-E072326074EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E3CFD63F-FD2F-40F2-BF99-E072326074EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E3CFD63F-FD2F-40F2-BF99-E072326074EF}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{E3CFD63F-FD2F-40F2-BF99-E072326074EF}.Debug|x64.Build.0 = Debug|Any CPU
-		{E3CFD63F-FD2F-40F2-BF99-E072326074EF}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{E3CFD63F-FD2F-40F2-BF99-E072326074EF}.Debug|x86.Build.0 = Debug|Any CPU
-		{E3CFD63F-FD2F-40F2-BF99-E072326074EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E3CFD63F-FD2F-40F2-BF99-E072326074EF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E3CFD63F-FD2F-40F2-BF99-E072326074EF}.Release|x64.ActiveCfg = Release|Any CPU
-		{E3CFD63F-FD2F-40F2-BF99-E072326074EF}.Release|x64.Build.0 = Release|Any CPU
-		{E3CFD63F-FD2F-40F2-BF99-E072326074EF}.Release|x86.ActiveCfg = Release|Any CPU
-		{E3CFD63F-FD2F-40F2-BF99-E072326074EF}.Release|x86.Build.0 = Release|Any CPU
 		{BFE61D8C-E947-4F75-98E2-17A276F72175}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BFE61D8C-E947-4F75-98E2-17A276F72175}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BFE61D8C-E947-4F75-98E2-17A276F72175}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -70,6 +58,18 @@ Global
 		{69306344-BD77-4AF6-8890-BF001D8EA7EE}.Release|x64.Build.0 = Release|x64
 		{69306344-BD77-4AF6-8890-BF001D8EA7EE}.Release|x86.ActiveCfg = Release|Win32
 		{69306344-BD77-4AF6-8890-BF001D8EA7EE}.Release|x86.Build.0 = Release|Win32
+		{E5984E13-442B-4833-AF21-A704B67A99AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5984E13-442B-4833-AF21-A704B67A99AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5984E13-442B-4833-AF21-A704B67A99AB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E5984E13-442B-4833-AF21-A704B67A99AB}.Debug|x64.Build.0 = Debug|Any CPU
+		{E5984E13-442B-4833-AF21-A704B67A99AB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E5984E13-442B-4833-AF21-A704B67A99AB}.Debug|x86.Build.0 = Debug|Any CPU
+		{E5984E13-442B-4833-AF21-A704B67A99AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5984E13-442B-4833-AF21-A704B67A99AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5984E13-442B-4833-AF21-A704B67A99AB}.Release|x64.ActiveCfg = Release|Any CPU
+		{E5984E13-442B-4833-AF21-A704B67A99AB}.Release|x64.Build.0 = Release|Any CPU
+		{E5984E13-442B-4833-AF21-A704B67A99AB}.Release|x86.ActiveCfg = Release|Any CPU
+		{E5984E13-442B-4833-AF21-A704B67A99AB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

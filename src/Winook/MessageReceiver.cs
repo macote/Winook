@@ -122,7 +122,11 @@
             Port = 0;
         }
 
-        public void Dispose() => Dispose(true);
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
         protected virtual void Dispose(bool disposing)
         {
@@ -130,14 +134,9 @@
             {
                 if (disposing)
                 {
-                    try
-                    {
-                        _listeningTask?.Dispose();
-                        _portSetEvent?.Dispose();
-                    }
-                    catch
-                    {
-                    }
+                    _listeningTask?.Dispose();
+                    _portSetEvent?.Dispose();
+                    _cancellationTokenSource?.Dispose();
                 }
 
                 _disposed = true;
@@ -147,8 +146,10 @@
         #endregion
     }
 
+#pragma warning disable CA1051 // Do not declare visible instance fields
     public class MessageEventArgs : EventArgs
     {
         public byte[] Bytes;
     }
+#pragma warning restore CA1051 // Do not declare visible instance fields
 }

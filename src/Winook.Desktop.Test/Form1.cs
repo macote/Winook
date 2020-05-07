@@ -9,6 +9,8 @@
     public partial class Form1 : Form
     {
         private MouseHook _mouseHook;
+        private Process _process;
+        private bool _mouseHookInstalled;
 
         public Form1()
         {
@@ -17,13 +19,27 @@
 
         private void button1_Click(object sender, EventArgs e)
         {
-            var process = Process.Start(@"c:\windows\notepad.exe");
-            //var process = Process.Start(@"c:\windows\syswow64\notepad.exe");
-            Task.Delay(222).GetAwaiter().GetResult();
+            if (!_mouseHookInstalled)
+            {
+                if (_process == null)
+                {
+                    _process = Process.Start(@"c:\windows\notepad.exe");
+                    //var process = Process.Start(@"c:\windows\syswow64\notepad.exe");
+                    Task.Delay(222).GetAwaiter().GetResult();
+                }
 
-            _mouseHook = new MouseHook(process);
-            _mouseHook.MouseMessageReceived += MouseHook_MouseMessageReceived;
-            _mouseHook.Install();
+                _mouseHook = new MouseHook(_process);
+                _mouseHook.MouseMessageReceived += MouseHook_MouseMessageReceived;
+                _mouseHook.Install();
+                _mouseHookInstalled = true;
+                button1.Text = "Unhook";
+            }
+            else
+            {
+                _mouseHook.Uninstall();
+                _mouseHookInstalled = false;
+                button1.Text = "Hook";
+            }
         }
 
         private void MouseHook_MouseMessageReceived(object sender, MouseMessageEventArgs e)
