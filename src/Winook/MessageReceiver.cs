@@ -134,6 +134,12 @@
             {
                 if (disposing)
                 {
+                    if (IsListening)
+                    {
+                        Stop();
+                        _listeningTask.Wait();
+                    }
+
                     _listeningTask?.Dispose();
                     _portSetEvent?.Dispose();
                     _cancellationTokenSource?.Dispose();

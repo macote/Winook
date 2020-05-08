@@ -51,7 +51,7 @@
             this.mouseLabel.Location = new System.Drawing.Point(11, 164);
             this.mouseLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.mouseLabel.Name = "mouseLabel";
-            this.mouseLabel.Size = new System.Drawing.Size(89, 13);
+            this.mouseLabel.Size = new System.Drawing.Size(105, 15);
             this.mouseLabel.TabIndex = 1;
             this.mouseLabel.Text = "Mouse messages";
             // 
@@ -70,7 +70,7 @@
             this.keyboardLabel.AutoSize = true;
             this.keyboardLabel.Location = new System.Drawing.Point(12, 186);
             this.keyboardLabel.Name = "keyboardLabel";
-            this.keyboardLabel.Size = new System.Drawing.Size(102, 13);
+            this.keyboardLabel.Size = new System.Drawing.Size(119, 15);
             this.keyboardLabel.TabIndex = 3;
             this.keyboardLabel.Text = "Keyboard messages";
             // 
@@ -86,6 +86,7 @@
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "Form1";
             this.Text = "Form1";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
 
