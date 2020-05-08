@@ -56,9 +56,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     INT argscount;
     const auto args = CommandLineToArgvW(GetCommandLine(), &argscount);
 
-    auto port = std::wstring(args[1]);
-    auto processid = std::stoi(args[2]);
-    auto mutexguid = std::wstring(args[3]);
+    auto hooktype = std::stoi(args[1]);
+    auto port = std::wstring(args[2]);
+    auto processid = std::stoi(args[3]);
+    auto mutexguid = std::wstring(args[4]);
 
     LocalFree(args);
 
@@ -111,8 +112,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     // Setup hook
 
-    auto hookproc = (HOOKPROC)GetProcAddress(hooklib, "MouseHookProc");
-    auto mousehook = SetWindowsHookEx(WH_MOUSE, hookproc, hooklib, threadid);
+    HOOKPROC hookproc;
+    if (hooktype == WH_MOUSE)
+    {
+        hookproc = (HOOKPROC)GetProcAddress(hooklib, "MouseHookProc");
+    }
+    else if (hooktype == WH_KEYBOARD)
+    {
+        hookproc = (HOOKPROC)GetProcAddress(hooklib, "KeyboardHookProc");
+    }
+    else
+    {
+        return EXIT_FAILURE;
+    }
+   
+    auto hook = SetWindowsHookEx(hooktype, hookproc, hooklib, threadid);
 
     // Wait on host mutex
 
@@ -124,9 +138,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     // Unhook
 
-    if (mousehook != NULL)
+    if (hook != NULL)
     {
-        UnhookWindowsHookEx(mousehook);
+        UnhookWindowsHookEx(hook);
     }
 
     if (hooklib != NULL)
