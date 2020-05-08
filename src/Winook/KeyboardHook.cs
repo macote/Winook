@@ -4,7 +4,7 @@
     using System.Diagnostics;
     using System.Diagnostics.Contracts;
 
-    public class KeyboardHook : Hook
+    public class KeyboardHook : HookBase
     {
         #region Fields
 

@@ -50,7 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="KeyboardHook.cs" />
-    <Compile Include="Hook.cs" />
+    <Compile Include="HookBase.cs" />
     <Compile Include="MessageReceiver.cs" />
     <Compile Include="MouseHook.cs" />
     <Compile Include="NativeMethods.cs" />

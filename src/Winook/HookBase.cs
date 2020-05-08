@@ -6,8 +6,9 @@
     using System.IO;
     using System.Reflection;
     using System.Threading;
+    using System.Threading.Tasks;
 
-    public abstract class Hook : IDisposable
+    public abstract class HookBase : IDisposable
     {
         #region Fields
 
@@ -15,8 +16,8 @@
 
         private Process _targetProcess;
         private Process _libHostProcess;
-        private Mutex _libHostMutex;
         private MessageReceiver _messageReceiver;
+        private ManualResetEvent _libHostMutexReleaseEvent;
         private int _hookType;
         private bool _disposed = false;
 
@@ -24,7 +25,7 @@
 
         #region Constructors
 
-        public Hook(Process targetProcess, int hookType, int messageSizeInBytes)
+        public HookBase(Process targetProcess, int hookType, int messageSizeInBytes)
         {
             _targetProcess = targetProcess;
             _hookType = hookType;
@@ -41,8 +42,21 @@
             _messageReceiver.StartListening();
 
             var libHostMutexGuid = Guid.NewGuid().ToString();
-            var libHostMutex = $"Global\\{libHostMutexGuid}";
-            _libHostMutex = new Mutex(true, libHostMutex, out bool _);
+            var libHostMutexName = $"Global\\{libHostMutexGuid}";
+            using (var acquireEvent = new ManualResetEvent(false))
+            {
+                _libHostMutexReleaseEvent = new ManualResetEvent(false);
+                Task.Run(() =>
+                {
+                    using (var mutex = new Mutex(true, libHostMutexName, out bool _))
+                    {
+                        acquireEvent.Set();
+                        _libHostMutexReleaseEvent.WaitOne();
+                        mutex.ReleaseMutex(); // Let host process unhook and terminate
+                }
+                });
+                acquireEvent.WaitOne();
+            }
 
             var libHostExtension = (Is64BitProcess(_targetProcess) ? ".x64" : ".x86") + ".exe";
             var libHostExeName = $"{LibHostExeBaseName}{libHostExtension}";
@@ -52,8 +66,8 @@
 
             _libHostProcess = Process.Start(libHostExePath, $"{_hookType} {_messageReceiver.Port} {_targetProcess.Id} {libHostMutexGuid}");
 
-            // TODO: add a hook confirmation by validating an init message sent from lib
             // TODO: check for lib host errors
+            // TODO: add a hook confirmation by validating an init message sent from lib
         }
 
         public void Uninstall()
@@ -99,11 +113,10 @@
 
         private void ReleaseAndDisposeMutex()
         {
-            if (_libHostMutex != null)
+            if (_libHostMutexReleaseEvent != null)
             {
-                _libHostMutex.ReleaseMutex(); // Let exe unhook and terminate
-                _libHostMutex.Dispose();
-                _libHostMutex = null;
+                _libHostMutexReleaseEvent.Set();
+                _libHostMutexReleaseEvent.Dispose();
             }
         }
 

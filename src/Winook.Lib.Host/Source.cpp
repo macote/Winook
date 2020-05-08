@@ -31,6 +31,9 @@
 #define WINOOKLIBNAME TEXT("Winook.Lib.x86.dll")
 #endif
 
+const std::string kKeyboardHookProcName = std::string("KeyboardHookProc");
+const std::string kMouseHookProcName = std::string("MouseHookProc");
+
 #if _DEBUG
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
@@ -47,8 +50,7 @@ extern "C" FILE * __cdecl __iob_func(void) { return _iob; }
 #endif
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
-{
-	
+{	
 #if _DEBUG && LOGWINOOKLIBHOST
     TimestampLogger logger(LOGWINOOKLIBHOSTPATH + TimestampLogger::GetTimestampString(TRUE) + TEXT(".log"), TRUE);
 #endif
@@ -112,20 +114,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     // Setup hook
 
-    HOOKPROC hookproc;
-    if (hooktype == WH_MOUSE)
+    std::string hookprocname;
+    if (hooktype == WH_KEYBOARD)
     {
-        hookproc = (HOOKPROC)GetProcAddress(hooklib, "MouseHookProc");
+        hookprocname = kKeyboardHookProcName;
     }
-    else if (hooktype == WH_KEYBOARD)
+    else if (hooktype == WH_MOUSE)
     {
-        hookproc = (HOOKPROC)GetProcAddress(hooklib, "KeyboardHookProc");
+        hookprocname = kMouseHookProcName;
     }
     else
     {
         return EXIT_FAILURE;
     }
    
+    auto hookproc = (HOOKPROC)GetProcAddress(hooklib, hookprocname.c_str());
     auto hook = SetWindowsHookEx(hooktype, hookproc, hooklib, threadid);
 
     // Wait on host mutex

@@ -31,7 +31,7 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "FileDescription", "Winook library to install hooks."
+            VALUE "FileDescription", "Winook Library"
             VALUE "FileVersion", "0.1.0.0"
             VALUE "LegalCopyright", "Marc-André Côté"
             VALUE "ProductName", "Winook Library"

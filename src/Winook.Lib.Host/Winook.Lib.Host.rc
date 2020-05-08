@@ -48,10 +48,10 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "FileDescription", "Winook library host application."
+            VALUE "FileDescription", "Winook Library Host Application"
             VALUE "FileVersion", "0.1.0.0"
             VALUE "LegalCopyright", "Marc-André Côté"
-            VALUE "ProductName", "Winook Library Host"
+            VALUE "ProductName", "Winook Library Host Application"
             VALUE "ProductVersion", "0.1.0"
         END
     END

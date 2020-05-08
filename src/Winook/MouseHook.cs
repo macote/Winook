@@ -4,7 +4,7 @@
     using System.Diagnostics;
     using System.Diagnostics.Contracts;
 
-    public class MouseHook : Hook
+    public class MouseHook : HookBase
     {
         #region Fields
 

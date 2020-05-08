@@ -21,6 +21,7 @@ private:
         if (processid == self->processid_ && MainWindowFinder::IsMainWindow(handle))
         {
             self->besthandle_ = handle;
+
             return FALSE;
         }
 
