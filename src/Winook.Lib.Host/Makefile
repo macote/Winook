@@ -21,8 +21,13 @@ else
 	CFLAGS = -std=c++17 -I../Winook.Common -DWINVER=0x0603 -D_WIN32_WINNT=0x0603 -DUNICODE -D_UNICODE -D_FORTIFY_SOURCE=2 -D_GLIBCXX_ASSERTIONS -O2 ${WARNS} -fmessage-length=0 -fasynchronous-unwind-tables
 endif
 
-LDFLAGS = -s -static -mwindows
-
+ifneq (${config},release)
+	CFLAGS += -D_DEBUG -g
+	LDFLAGS = -static -mwindows
+else
+	LDFLAGS = -s -static -mwindows
+endif
+    
 .PHONY: all clean
 
 all: bin/${EXE}

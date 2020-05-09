@@ -83,11 +83,5 @@
                 keyboardLabel.Text = $"Keyboard Virtual Key Code: {e.VirtualKeyCode}; Flags: {e.Flags}";
             });
         }
-
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            _mouseHook?.Dispose();
-            _keyboardHook?.Dispose();
-        }
     }
 }

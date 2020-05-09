@@ -7,7 +7,7 @@
 #include <regex>
 #include <string>
 
-#define LOGWINOOKLIB 0
+#define LOGWINOOKLIB 1
 #if _DEBUG && LOGWINOOKLIB
 #define LOGWINOOKLIBPATH TEXT("C:\\Temp\\WinookLibHookProc_")
 #include "DebugHelper.h"
@@ -56,16 +56,19 @@ void Initialize(HINSTANCE hinst)
     const int kPathBufferSize = 1024;
     TCHAR modulepath[kPathBufferSize];
     GetModuleFileName(NULL, modulepath, kPathBufferSize);
-    auto configfilepath = ConfigHelper::GetConfigFilePath(modulepath, hinst, GetCurrentProcessId(), GetThreadId(GetCurrentThread()));
+    const auto configfilepath = ConfigHelper::GetConfigFilePath(modulepath, hinst, GetCurrentProcessId(), GetThreadId(GetCurrentThread()));
     WIN32_FIND_DATA findfiledata;
-    auto find = FindFirstFile(configfilepath.c_str(), &findfiledata);
+    const auto find = FindFirstFile(configfilepath.c_str(), &findfiledata);
     if (find != INVALID_HANDLE_VALUE)
     {
         FindClose(find);
         StreamLineReader configfile(configfilepath);
-        auto portstring = configfile.ReadLine();
-        auto port = std::stoi(portstring);
+        const auto port = std::stoi(configfile.ReadLine());
         messagesender.Connect(std::to_string(port));
+    }
+    else
+    {
+        // TODO: handle error
     }
 }
 
@@ -86,7 +89,7 @@ void LogDllMain(HINSTANCE hinst, std::wstring reason)
 LRESULT CALLBACK KeyboardHookProc(int code, WPARAM wParam, LPARAM lParam)
 {
 #if _DEBUG && LOGWINOOKLIB
-    Logger.WriteLine(DebugHelper::FormatMouseHookMessage(code, wParam, lParam));
+    Logger.WriteLine(DebugHelper::FormatKeyboardHookMessage(code, wParam, lParam));
 #endif
     if (code == HC_ACTION)
     {
@@ -106,7 +109,7 @@ LRESULT CALLBACK MouseHookProc(int code, WPARAM wParam, LPARAM lParam)
 #endif
     if (code == HC_ACTION)
     {
-        HookMouseMessage hmm;
+        HookMouseMessage hmm{};
         hmm.messageCode = (DWORD)wParam;
         if (wParam == WM_MOUSEWHEEL)
         {
@@ -124,7 +127,6 @@ LRESULT CALLBACK MouseHookProc(int code, WPARAM wParam, LPARAM lParam)
             hmm.pointY = pmhs->pt.y;
             hmm.hwnd = (DWORD)PtrToInt(pmhs->hwnd);
             hmm.hitTestCode = (DWORD)pmhs->wHitTestCode;
-            hmm.zDelta = 0;
         }
 
         messagesender.SendMessage(&hmm, sizeof(HookMouseMessage));

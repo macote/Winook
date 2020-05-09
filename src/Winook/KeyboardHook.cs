@@ -47,12 +47,4 @@
 
         #endregion
     }
-
-#pragma warning disable CA1051 // Do not declare visible instance fields
-    public class KeyboardMessageEventArgs : EventArgs
-    {
-        public int VirtualKeyCode;
-        public int Flags;
-    }
-#pragma warning restore CA1051 // Do not declare visible instance fields
 }

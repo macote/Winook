@@ -16,7 +16,10 @@
             if (disposing && (components != null))
             {
                 components.Dispose();
+                _mouseHook?.Dispose();
+                _keyboardHook?.Dispose();
             }
+
             base.Dispose(disposing);
         }
 
@@ -86,7 +89,6 @@
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "Form1";
             this.Text = "Form1";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
 

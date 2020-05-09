@@ -49,8 +49,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helper.cs" />
     <Compile Include="KeyboardHook.cs" />
     <Compile Include="HookBase.cs" />
+    <Compile Include="KeyboardMessageEventArg.cs" />
+    <Compile Include="MessageEventArgs.cs" />
     <Compile Include="MessageReceiver.cs" />
     <Compile Include="MouseHook.cs" />
     <Compile Include="NativeMethods.cs" />
@@ -71,6 +74,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MouseMessageEventArgs.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

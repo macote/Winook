@@ -21,7 +21,12 @@ else
 	CFLAGS = -std=c++17 -I../Winook.Common -I../../3rd/asio/asio/include -DWINVER=0x0603 -D_WIN32_WINNT=0x0603 -DUNICODE -D_UNICODE -D_FORTIFY_SOURCE=2 -D_GLIBCXX_ASSERTIONS -DASIO_STANDALONE -O2 ${WARNS} -fmessage-length=0 -fasynchronous-unwind-tables
 endif
 
-LDFLAGS = -s -shared -static -Wl,--kill-at,--subsystem,windows -lws2_32
+ifneq (${config},release)
+	CFLAGS += -D_DEBUG -g
+	LDFLAGS = -shared -static -Wl,--kill-at,--subsystem,windows -lws2_32
+else
+	LDFLAGS = -s -shared -static -Wl,--kill-at,--subsystem,windows -lws2_32
+endif
 
 .PHONY: all clean
 

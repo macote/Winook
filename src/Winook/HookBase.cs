@@ -1,10 +1,8 @@
 ﻿namespace Winook
 {
     using System;
-    using System.ComponentModel;
     using System.Diagnostics;
     using System.IO;
-    using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -58,9 +56,9 @@
                 acquireEvent.WaitOne();
             }
 
-            var libHostExtension = (Is64BitProcess(_targetProcess) ? ".x64" : ".x86") + ".exe";
+            var libHostExtension = (Helper.Is64BitProcess(_targetProcess) ? ".x64" : ".x86") + ".exe";
             var libHostExeName = $"{LibHostExeBaseName}{libHostExtension}";
-            var libHostExePath = Path.Combine(GetExecutingAssemblyDirectory(), libHostExeName);
+            var libHostExePath = Path.Combine(Helper.GetExecutingAssemblyDirectory(), libHostExeName);
 
             Debug.WriteLine($"{libHostExeName} args: {_hookType} {_messageReceiver.Port} {_targetProcess.Id} {libHostMutexGuid}");
 
@@ -70,7 +68,7 @@
             // TODO: add a hook confirmation by validating an init message sent from lib
         }
 
-        public void Uninstall()
+        public virtual void Uninstall()
         {
             ReleaseAndDisposeMutex();
             _messageReceiver.Stop();
@@ -97,39 +95,16 @@
             }
         }
 
-        private static bool Is64BitProcess(Process process)
-        {
-            if (!Environment.Is64BitOperatingSystem)
-            {
-                return false;
-            }
-            if (!NativeMethods.IsWow64Process(process.Handle, out bool wow64Process))
-            {
-                throw new Win32Exception();
-            }
-
-            return !wow64Process;
-        }
+        protected abstract void OnMessageReceived(object sender, MessageEventArgs e);
 
         private void ReleaseAndDisposeMutex()
         {
-            if (_libHostMutexReleaseEvent != null)
+            if (_libHostMutexReleaseEvent != null && !_libHostMutexReleaseEvent.SafeWaitHandle.IsClosed)
             {
                 _libHostMutexReleaseEvent.Set();
                 _libHostMutexReleaseEvent.Dispose();
             }
         }
-
-        private static string GetExecutingAssemblyDirectory()
-        {
-            var codeBase = Assembly.GetExecutingAssembly().CodeBase;
-            var uri = new UriBuilder(codeBase);
-            var path = Uri.UnescapeDataString(uri.Path);
-
-            return Path.GetDirectoryName(path);
-        }
-
-        protected abstract void OnMessageReceived(object sender, MessageEventArgs e);
 
         #endregion
     }
