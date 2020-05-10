@@ -23,11 +23,11 @@
         {
             if (!_mouseHookInstalled)
             {
-                if (_process == null)
+                if (_process == null || _process.HasExited)
                 {
                     _process = Process.Start(@"c:\windows\notepad.exe");
                     //var process = Process.Start(@"c:\windows\syswow64\notepad.exe");
-                    Task.Delay(222).GetAwaiter().GetResult();
+                    _process.WaitForInputIdle();
                 }
 
                 _mouseHook = new MouseHook(_process);
