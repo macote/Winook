@@ -37,6 +37,7 @@
 
         public virtual void Install()
         {
+            _targetProcess.WaitForInputIdle();
             _messageReceiver.StartListening();
 
             var libHostMutexGuid = Guid.NewGuid().ToString();
