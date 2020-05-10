@@ -7,7 +7,7 @@
 #include <regex>
 #include <string>
 
-#define LOGWINOOKLIB 1
+#define LOGWINOOKLIB 0
 #if _DEBUG && LOGWINOOKLIB
 #define LOGWINOOKLIBPATH TEXT("C:\\Temp\\WinookLibHookProc_")
 #include "DebugHelper.h"
