@@ -37,7 +37,7 @@
 
         public virtual void Install()
         {
-            _targetProcess.WaitForInputIdle();
+            WaitForInputIdle();
             _messageReceiver.StartListening();
 
             var libHostMutexGuid = Guid.NewGuid().ToString();
@@ -104,6 +104,17 @@
             {
                 _libHostMutexReleaseEvent.Set();
                 _libHostMutexReleaseEvent.Dispose();
+            }
+        }
+
+        private void WaitForInputIdle()
+        {
+            try
+            {
+                _targetProcess.WaitForInputIdle(2000);
+            }
+            catch (InvalidOperationException)
+            {
             }
         }
 
