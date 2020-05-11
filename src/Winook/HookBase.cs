@@ -11,6 +11,7 @@
         #region Fields
 
         private const string LibHostExeBaseName = "winook.support\\Winook.Lib.Host";
+        private const int ProcessWaitForInputIdleWaitTimeInMilliseconds = 2000;
 
         private Process _targetProcess;
         private Process _libHostProcess;
@@ -37,7 +38,11 @@
 
         public virtual void Install()
         {
-            WaitForInputIdle();
+            if (!_targetProcess.WaitForInputIdle(ProcessWaitForInputIdleWaitTimeInMilliseconds))
+            {
+                // The wait time should be good enough to continue
+            }
+
             _messageReceiver.StartListening();
 
             var libHostMutexGuid = Guid.NewGuid().ToString();
@@ -104,17 +109,6 @@
             {
                 _libHostMutexReleaseEvent.Set();
                 _libHostMutexReleaseEvent.Dispose();
-            }
-        }
-
-        private void WaitForInputIdle()
-        {
-            try
-            {
-                _targetProcess.WaitForInputIdle(2000);
-            }
-            catch (InvalidOperationException)
-            {
             }
         }
 
