@@ -8,14 +8,14 @@
 
     internal class Helper
     {
-        internal static bool Is64BitProcess(Process process)
+        internal static bool Is64BitProcess(IntPtr processHandle)
         {
             if (!Environment.Is64BitOperatingSystem)
             {
                 return false;
             }
 
-            if (!NativeMethods.IsWow64Process(process.Handle, out bool wow64Process))
+            if (!NativeMethods.IsWow64Process(processHandle, out bool wow64Process))
             {
                 throw new Win32Exception();
             }

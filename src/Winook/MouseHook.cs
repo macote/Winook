@@ -9,7 +9,7 @@
         #region Fields
 
         private const int HookMessageSizeInBytes = 24;
-        private const int HookType = 7; // WH_MOUSE
+        private const HookType MouseHookType = HookType.Mouse; // WH_MOUSE
 
         private const int LeftButtonUpMessageCode = 0x0202; // WM_LBUTTONUP
 
@@ -25,7 +25,7 @@
         #region Constructors
 
         public MouseHook(Process targetProcess)
-            : base(targetProcess, HookType, HookMessageSizeInBytes)
+            : base(targetProcess, MouseHookType, HookMessageSizeInBytes)
         {
         }
 

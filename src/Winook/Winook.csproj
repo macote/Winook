@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helper.cs" />
+    <Compile Include="HookType.cs" />
     <Compile Include="KeyboardHook.cs" />
     <Compile Include="HookBase.cs" />
     <Compile Include="KeyboardMessageEventArg.cs" />

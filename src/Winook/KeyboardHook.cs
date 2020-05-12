@@ -9,7 +9,7 @@
         #region Fields
 
         private const int HookMessageSizeInBytes = 8;
-        private const int HookType = 2; // WH_KEYBOARD
+        private const HookType KeyboardHookType = HookType.Keyboard; // WH_KEYBOARD
 
         #endregion
 
@@ -22,7 +22,7 @@
         #region Constructors
 
         public KeyboardHook(Process targetProcess)
-            : base(targetProcess, HookType, HookMessageSizeInBytes)
+            : base(targetProcess, KeyboardHookType, HookMessageSizeInBytes)
         {
         }
 
