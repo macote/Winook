@@ -1,5 +1,5 @@
 #include "Source.h"
-#include "ConfigHelper.h"
+#include "Winook.h"
 #include "MessageSender.h"
 #include "StreamLineReader.h"
 
@@ -53,10 +53,10 @@ BOOL WINAPI DllMain(HINSTANCE hinst, DWORD fdwReason, LPVOID lpReserved)
 void Initialize(HINSTANCE hinst)
 {
     // Look for initialization file stored in %TEMP%
-    const int kPathBufferSize = 1024;
+
     TCHAR modulepath[kPathBufferSize];
     GetModuleFileName(NULL, modulepath, kPathBufferSize);
-    const auto configfilepath = ConfigHelper::GetConfigFilePath(modulepath, hinst, GetCurrentProcessId(), GetThreadId(GetCurrentThread()));
+    const auto configfilepath = Winook::GetConfigFilePath(modulepath, hinst, GetCurrentProcessId(), GetThreadId(GetCurrentThread()));
     WIN32_FIND_DATA findfiledata;
     const auto find = FindFirstFile(configfilepath.c_str(), &findfiledata);
     if (find != INVALID_HANDLE_VALUE)
@@ -64,6 +64,8 @@ void Initialize(HINSTANCE hinst)
         FindClose(find);
         StreamLineReader configfile(configfilepath);
         const auto port = std::stoi(configfile.ReadLine());
+        configfile.Close();
+        DeleteFile(configfilepath.c_str());
         messagesender.Connect(std::to_string(port));
     }
     else

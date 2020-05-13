@@ -4,11 +4,11 @@
 
 #include "asio.hpp"
 
-#define LOGHOOKLIBMESSAGESENDER 0
-#if _DEBUG && LOGHOOKLIBMESSAGESENDER
-#define LOGHOOKLIBMESSAGESENDERPATH TEXT("C:\\Temp\\HookLibMessageSender_")
+#define LOGWINOOKMESSAGESENDER 0
+#if _DEBUG && LOGWINOOKMESSAGESENDER
+#define LOGWINOOKMESSAGESENDERPATH TEXT("C:\\Temp\\WinookMessageSender_")
 #include "DebugHelper.h"
-TimestampLogger MessageSenderLogger = TimestampLogger(LOGHOOKLIBMESSAGESENDERPATH + TimestampLogger::GetTimestampString(TRUE) + TEXT(".log"), TRUE);
+TimestampLogger MessageSenderLogger = TimestampLogger(LOGWINOOKMESSAGESENDERPATH + TimestampLogger::GetTimestampString(TRUE) + TEXT(".log"), TRUE);
 #endif
 
 using asio::ip::tcp;

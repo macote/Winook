@@ -6,32 +6,40 @@
     using System.Threading;
     using System.Threading.Tasks;
 
+    public enum ProcessBitness
+    {
+        Unknown,
+        Is32Bit,
+        Is64Bit
+    }
+
     public abstract class HookBase : IDisposable
     {
         #region Fields
 
         private const string LibHostExeBaseName = "winook.support\\Winook.Lib.Host";
-        private const int ProcessWaitForInputIdleWaitTimeInMilliseconds = 2000;
 
         private readonly int _processId;
         private readonly MessageReceiver _messageReceiver;
         private readonly HookType _hookType;
         private Process _libHostProcess;
         private ManualResetEvent _libHostMutexReleaseEvent;
+        private ProcessBitness _processBitness;
         private bool _disposed = false;
 
         #endregion
 
         #region Constructors
 
-        public HookBase(Process process, HookType hookType, int messageSizeInBytes)
+        public HookBase(int processId, HookType hookType, int messageSizeInBytes)
+            : this(processId, ProcessBitness.Unknown, hookType, messageSizeInBytes)
         {
-            if (process == null)
-            {
-                throw new ArgumentNullException(nameof(process));
-            }
+        }
 
-            _processId = process.Id;
+        public HookBase(int processId, ProcessBitness processBitness, HookType hookType, int messageSizeInBytes)
+        {
+            _processId = processId;
+            _processBitness = processBitness;
             _hookType = hookType;
             _messageReceiver = new MessageReceiver(messageSizeInBytes);
             _messageReceiver.MessageReceived += OnMessageReceived;
@@ -43,11 +51,16 @@
 
         public virtual void Install()
         {
-            using var process = GetProcess();
-            var processHandle = process.Handle;
-            if (!process.WaitForInputIdle(ProcessWaitForInputIdleWaitTimeInMilliseconds))
+            var is64BitProcess = false;
+            if (_processBitness == ProcessBitness.Unknown)
             {
-                // Assume that the wait time is good enough to continue
+                using var process = GetProcess();
+                var processHandle = process.Handle;
+                is64BitProcess = Helper.Is64BitProcess(processHandle);
+            } 
+            else if (_processBitness == ProcessBitness.Is64Bit)
+            {
+                is64BitProcess = true;
             }
 
             _messageReceiver.StartListening();
@@ -67,7 +80,7 @@
                 acquireEvent.WaitOne();
             }
 
-            var libHostExtension = (Helper.Is64BitProcess(processHandle) ? ".x64" : ".x86") + ".exe";
+            var libHostExtension = (is64BitProcess ? ".x64" : ".x86") + ".exe";
             var libHostExeName = $"{LibHostExeBaseName}{libHostExtension}";
             var libHostExePath = Path.Combine(Helper.GetExecutingAssemblyDirectory(), libHostExeName);
 

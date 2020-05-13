@@ -24,8 +24,13 @@
 
         #region Constructors
 
-        public MouseHook(Process targetProcess)
-            : base(targetProcess, MouseHookType, HookMessageSizeInBytes)
+        public MouseHook(int processId)
+            : this(processId, ProcessBitness.Unknown)
+        {
+        }
+
+        public MouseHook(int processId, ProcessBitness processBitness)
+            : base(processId, processBitness, MouseHookType, HookMessageSizeInBytes)
         {
         }
 

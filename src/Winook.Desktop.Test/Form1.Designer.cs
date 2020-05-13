@@ -35,14 +35,16 @@
             this.mouseLabel = new System.Windows.Forms.Label();
             this.keyboardButton = new System.Windows.Forms.Button();
             this.keyboardLabel = new System.Windows.Forms.Label();
+            this.radio32bit = new System.Windows.Forms.RadioButton();
+            this.radio64bit = new System.Windows.Forms.RadioButton();
             this.SuspendLayout();
             // 
             // mouseButton
             // 
-            this.mouseButton.Location = new System.Drawing.Point(7, 7);
-            this.mouseButton.Margin = new System.Windows.Forms.Padding(2);
+            this.mouseButton.Location = new System.Drawing.Point(13, 13);
+            this.mouseButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.mouseButton.Name = "mouseButton";
-            this.mouseButton.Size = new System.Drawing.Size(180, 140);
+            this.mouseButton.Size = new System.Drawing.Size(330, 221);
             this.mouseButton.TabIndex = 0;
             this.mouseButton.Text = "Mouse Hook";
             this.mouseButton.UseVisualStyleBackColor = true;
@@ -51,18 +53,19 @@
             // mouseLabel
             // 
             this.mouseLabel.AutoSize = true;
-            this.mouseLabel.Location = new System.Drawing.Point(11, 164);
-            this.mouseLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.mouseLabel.Location = new System.Drawing.Point(20, 303);
+            this.mouseLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.mouseLabel.Name = "mouseLabel";
-            this.mouseLabel.Size = new System.Drawing.Size(105, 15);
+            this.mouseLabel.Size = new System.Drawing.Size(167, 25);
             this.mouseLabel.TabIndex = 1;
             this.mouseLabel.Text = "Mouse messages";
             // 
             // keyboardButton
             // 
-            this.keyboardButton.Location = new System.Drawing.Point(192, 7);
+            this.keyboardButton.Location = new System.Drawing.Point(352, 13);
+            this.keyboardButton.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.keyboardButton.Name = "keyboardButton";
-            this.keyboardButton.Size = new System.Drawing.Size(180, 140);
+            this.keyboardButton.Size = new System.Drawing.Size(330, 221);
             this.keyboardButton.TabIndex = 2;
             this.keyboardButton.Text = "Keyboard Hook";
             this.keyboardButton.UseVisualStyleBackColor = true;
@@ -71,22 +74,48 @@
             // keyboardLabel
             // 
             this.keyboardLabel.AutoSize = true;
-            this.keyboardLabel.Location = new System.Drawing.Point(12, 186);
+            this.keyboardLabel.Location = new System.Drawing.Point(22, 343);
+            this.keyboardLabel.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.keyboardLabel.Name = "keyboardLabel";
-            this.keyboardLabel.Size = new System.Drawing.Size(119, 15);
+            this.keyboardLabel.Size = new System.Drawing.Size(192, 25);
             this.keyboardLabel.TabIndex = 3;
             this.keyboardLabel.Text = "Keyboard messages";
             // 
+            // radio32bit
+            // 
+            this.radio32bit.AutoSize = true;
+            this.radio32bit.Checked = true;
+            this.radio32bit.Location = new System.Drawing.Point(13, 242);
+            this.radio32bit.Name = "radio32bit";
+            this.radio32bit.Size = new System.Drawing.Size(86, 29);
+            this.radio32bit.TabIndex = 4;
+            this.radio32bit.TabStop = true;
+            this.radio32bit.Text = "32-bit";
+            this.radio32bit.UseVisualStyleBackColor = true;
+            // 
+            // radio64bit
+            // 
+            this.radio64bit.AutoSize = true;
+            this.radio64bit.Location = new System.Drawing.Point(167, 242);
+            this.radio64bit.Name = "radio64bit";
+            this.radio64bit.Size = new System.Drawing.Size(86, 29);
+            this.radio64bit.TabIndex = 5;
+            this.radio64bit.TabStop = true;
+            this.radio64bit.Text = "64-bit";
+            this.radio64bit.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(378, 219);
+            this.ClientSize = new System.Drawing.Size(693, 404);
+            this.Controls.Add(this.radio64bit);
+            this.Controls.Add(this.radio32bit);
             this.Controls.Add(this.keyboardLabel);
             this.Controls.Add(this.keyboardButton);
             this.Controls.Add(this.mouseLabel);
             this.Controls.Add(this.mouseButton);
-            this.Margin = new System.Windows.Forms.Padding(2);
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "Form1";
             this.Text = "Form1";
             this.ResumeLayout(false);
@@ -100,6 +129,8 @@
         private System.Windows.Forms.Label mouseLabel;
         private System.Windows.Forms.Button keyboardButton;
         private System.Windows.Forms.Label keyboardLabel;
+        private System.Windows.Forms.RadioButton radio32bit;
+        private System.Windows.Forms.RadioButton radio64bit;
     }
 }
 

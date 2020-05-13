@@ -1,22 +1,7 @@
-#ifndef UNICODE
-#define UNICODE
-#endif
-#ifndef _UNICODE
-#define _UNICODE
-#endif
-
 #define STRICT
 #define WIN32_LEAN_AND_MEAN
 
-#define PATH_BUFFER_SIZE 1024
-
-#define LOGWINOOKLIBHOST 0
-#if _DEBUG && LOGWINOOKLIBHOST
-#define LOGWINOOKLIBHOSTPATH TEXT("C:\\Temp\\WinookLibHost_")
-#include "DebugHelper.h"
-#endif
-
-#include "ConfigHelper.h"
+#include "Winook.h"
 #include "MainWindowFinder.h"
 #include "StreamLineWriter.h"
 
@@ -24,15 +9,6 @@
 #include <shellapi.h>
 
 #include <string>
-
-#if defined(WINOOKLIBHOST64)
-#define WINOOKLIBNAME TEXT("Winook.Lib.x64.dll")
-#else
-#define WINOOKLIBNAME TEXT("Winook.Lib.x86.dll")
-#endif
-
-const std::string kKeyboardHookProcName = std::string("KeyboardHookProc");
-const std::string kMouseHookProcName = std::string("MouseHookProc");
 
 #if _DEBUG
 #define _CRTDBG_MAP_ALLOC
@@ -49,12 +25,17 @@ extern "C" FILE * __cdecl __iob_func(void) { return _iob; }
 #endif
 #endif
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
-{	
+#define LOGWINOOKLIBHOST 0
 #if _DEBUG && LOGWINOOKLIBHOST
-    TimestampLogger logger(LOGWINOOKLIBHOSTPATH + TimestampLogger::GetTimestampString(TRUE) + TEXT(".log"), TRUE);
+#define LOGWINOOKLIBHOSTPATH TEXT("C:\\Temp\\WinookLibHost_")
+#include "DebugHelper.h"
+TimestampLogger Logger(LOGWINOOKLIBHOSTPATH + TimestampLogger::GetTimestampString(TRUE) + TEXT(".log"), TRUE);
 #endif
 
+#define PROCESS_WAITFORINPUTIDLE_TIMEOUT_INTERVAL_IN_MILLISECONDS 2000
+
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+{	
     INT argscount;
     const auto args = CommandLineToArgvW(GetCommandLine(), &argscount);
 
@@ -64,6 +45,31 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     const auto mutexguid = std::wstring(args[4]);
 
     LocalFree(args);
+
+    // Get process full path
+
+    const auto process = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processid);
+    if (process == NULL)
+    {
+        return EXIT_FAILURE;
+    }
+
+    TCHAR processfullpath[kPathBufferSize];
+    DWORD processfullpathsize = sizeof(processfullpath);
+    if (!QueryFullProcessImageName(process, 0, processfullpath, &processfullpathsize))
+    {
+        return EXIT_FAILURE;
+    }
+
+    // Ensure its main window is ready
+
+    const auto waitresult = WaitForInputIdle(process, PROCESS_WAITFORINPUTIDLE_TIMEOUT_INTERVAL_IN_MILLISECONDS);
+    CloseHandle(process);
+
+    if (waitresult == WAIT_FAILED)
+    {
+        return EXIT_FAILURE;
+    }
 
     // Find process main window thread id
 
@@ -80,38 +86,33 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         return EXIT_FAILURE;
     }
 
-    // Get process full path
+    // Get lib path
 
-    const auto process = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processid);
-    if (process == NULL)        
-    { 
-        return EXIT_FAILURE;
-    }
-
-    TCHAR processfullpath[PATH_BUFFER_SIZE];
-    DWORD processfullpathsize = sizeof(processfullpath);
-    if (!QueryFullProcessImageName(process, 0, processfullpath, &processfullpathsize))
-    {
-        return EXIT_FAILURE;
-    }
-
-    CloseHandle(process);
-
-    // Determine dll path - dll is in same folder as self
-
-    TCHAR modulepath[PATH_BUFFER_SIZE];
-    if (!GetModuleFileName(NULL, modulepath, PATH_BUFFER_SIZE))
+    TCHAR modulepath[kPathBufferSize];
+    if (!GetModuleFileName(NULL, modulepath, kPathBufferSize))
     {
         return EXIT_FAILURE;
     }
 
     const auto modulepathtmp = std::wstring(modulepath);
     const auto modulefolder = modulepathtmp.substr(0, modulepathtmp.find_last_of(TEXT("\\")) + 1);
-    TCHAR hooklibpath[PATH_BUFFER_SIZE];
-    swprintf(hooklibpath, sizeof(hooklibpath), TEXT("%ls%ls"),
-        modulefolder.c_str(), WINOOKLIBNAME);
+    TCHAR hooklibpath[kPathBufferSize];
+    std::wstring hooklibname;
+    if (hooktype == WH_KEYBOARD)
+    {
+        hooklibname = kKeyboardHookLibName;
+    }
+    else if (hooktype == WH_MOUSE)
+    {
+        hooklibname = kMouseHookLibName;
+    }
+    else
+    {
+        return EXIT_FAILURE;
+    }
 
-    // Load dll
+    swprintf(hooklibpath, sizeof(hooklibpath), TEXT("%ls%ls"),
+        modulefolder.c_str(), hooklibname.c_str());
 
     const auto hooklib = LoadLibrary(hooklibpath);
     if (hooklib == NULL)
@@ -119,13 +120,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         return EXIT_FAILURE;
     }
 
-    // Build configuration file path
-
-    const auto configfilepath = ConfigHelper::GetConfigFilePath(processfullpath, hooklib, processid, threadid);
-
     // Write configuration file
 
-    StreamLineWriter configfile(configfilepath, false);
+    StreamLineWriter configfile(
+        Winook::GetConfigFilePath(processfullpath, hooklib, processid, threadid), 
+        false);
     configfile.WriteLine(port);
     configfile.Close();
 
@@ -162,6 +161,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     TCHAR mutexname[256];
     swprintf(mutexname, sizeof(mutexname), TEXT("Global\\%ls"), mutexguid.c_str());
     const auto mutex = OpenMutex(SYNCHRONIZE, FALSE, mutexname);
+    if (mutex == NULL)
+    {
+        return EXIT_FAILURE;
+    }
+
     auto event = WaitForSingleObject(mutex, INFINITE);
     if (event == WAIT_FAILED)
     {

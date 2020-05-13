@@ -2,12 +2,13 @@
 {
     using System;
     using System.ComponentModel;
-    using System.Diagnostics;
     using System.IO;
     using System.Reflection;
 
     internal class Helper
     {
+        #region Methods
+
         internal static bool Is64BitProcess(IntPtr processHandle)
         {
             if (!Environment.Is64BitOperatingSystem)
@@ -31,5 +32,7 @@
 
             return Path.GetDirectoryName(path);
         }
+
+        #endregion
     }
 }

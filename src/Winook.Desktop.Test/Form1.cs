@@ -2,7 +2,6 @@
 {
     using System;
     using System.Diagnostics;
-    using System.Threading.Tasks;
     using System.Windows.Forms;
     using Winook;
 
@@ -25,12 +24,17 @@
             {
                 if (_process == null || _process.HasExited)
                 {
-                    _process = Process.Start(@"c:\windows\notepad.exe");
-                    //var process = Process.Start(@"c:\windows\syswow64\notepad.exe");
-                    _process.WaitForInputIdle();
+                    if (radio32bit.Checked)
+                    {
+                        _process = Process.Start(@"c:\windows\syswow64\notepad.exe");
+                    }
+                    else
+                    {
+                        _process = Process.Start(@"c:\windows\notepad.exe");
+                    }
                 }
 
-                _mouseHook = new MouseHook(_process);
+                _mouseHook = new MouseHook(_process.Id);
                 _mouseHook.MessageReceived += MouseHook_MessageReceived;
                 _mouseHook.Install();
                 _mouseHookInstalled = true;
@@ -55,14 +59,19 @@
         {
             if (!_keyboardHookInstalled)
             {
-                if (_process == null)
+                if (_process == null || _process.HasExited)
                 {
-                    _process = Process.Start(@"c:\windows\notepad.exe");
-                    //var process = Process.Start(@"c:\windows\syswow64\notepad.exe");
-                    Task.Delay(222).GetAwaiter().GetResult();
+                    if (radio32bit.Checked)
+                    {
+                        _process = Process.Start(@"c:\windows\syswow64\notepad.exe");
+                    }
+                    else
+                    {
+                        _process = Process.Start(@"c:\windows\notepad.exe");
+                    }
                 }
 
-                _keyboardHook = new KeyboardHook(_process);
+                _keyboardHook = new KeyboardHook(_process.Id);
                 _keyboardHook.MessageReceived += KeyboardHook_MessageReceived;
                 _keyboardHook.Install();
                 _keyboardHookInstalled = true;

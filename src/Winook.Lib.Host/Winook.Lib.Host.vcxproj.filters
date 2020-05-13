@@ -36,7 +36,7 @@
     <ClInclude Include="..\Winook.Common\TimestampLogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Winook.Common\ConfigHelper.h">
+    <ClInclude Include="..\Winook.Common\Winook.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

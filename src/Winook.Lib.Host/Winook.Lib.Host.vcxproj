@@ -172,7 +172,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\Winook.Common\ConfigHelper.h" />
+    <ClInclude Include="..\Winook.Common\Winook.h" />
     <ClInclude Include="..\Winook.Common\DebugHelper.h" />
     <ClInclude Include="..\Winook.Common\FileStream.h" />
     <ClInclude Include="..\Winook.Common\StreamLineReader.h" />

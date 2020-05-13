@@ -21,8 +21,13 @@
 
         #region Constructors
 
-        public KeyboardHook(Process targetProcess)
-            : base(targetProcess, KeyboardHookType, HookMessageSizeInBytes)
+        public KeyboardHook(int processId)
+            : this(processId, ProcessBitness.Unknown)
+        {
+        }
+
+        public KeyboardHook(int processId, ProcessBitness processBitness)
+            : base(processId, processBitness, KeyboardHookType, HookMessageSizeInBytes)
         {
         }
 
