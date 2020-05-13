@@ -4,7 +4,7 @@ Winook is a Windows library that let you install thread-level hooks inside proce
 
 # Information
 
-Winook uses dll injection and a host process to setup hooks.
+Winook uses a host process and dll injection to setup hooks.
 
 # Installation
 
@@ -20,9 +20,8 @@ Install-Package -IncludePrerelease Winook
 ``` csharp
 _process = Process.Start(@"c:\windows\notepad.exe");
 //_process = Process.Start(@"c:\windows\syswow64\notepad.exe"); // works also with 32-bit
-_process.WaitForInputIdle();
 
-_mouseHook = new MouseHook(_process);
+_mouseHook = new MouseHook(_process.Id);
 _mouseHook.MessageReceived += MouseHook_MessageReceived;
 _mouseHook.Install();
 
@@ -35,6 +34,11 @@ private void MouseHook_MessageReceived(object sender, MouseMessageEventArgs e)
 ```
 
 Keyboard hooking works in a similar way.
+
+# Known Issues
+
+- The process bitness detection may fail. If the process bitness is known in advance, it is possible to specify it using an overloaded constructor.
+- Keyboard and mouse hooking cannot be used simultaneously.
 
 # License
 
