@@ -73,22 +73,28 @@ BOOL Initialize(HINSTANCE hinst)
     Logger.WriteLine(TEXT("dllfilepath: ") + std::wstring(dllfilepath));
 #endif
     int hooktype{};
-    if (StrStrIW(dllfilepath, kKeyboardHookLibName.c_str()) != NULL)
+    if (StrStrI(dllfilepath, kKeyboardHookLibName.c_str()) != NULL)
     {
         hooktype = WH_KEYBOARD;
     }
-    else if (StrStrIW(dllfilepath, kMouseHookLibName.c_str()) != NULL)
+    else if (StrStrI(dllfilepath, kMouseHookLibName.c_str()) != NULL)
     {
         hooktype = WH_MOUSE;
     }
     else
     {
+#if _DEBUG && LOGWINOOKLIB
+        Logger.WriteLine(TEXT("Unsupported hook type."));
+#endif
         return FALSE; // Unsupported hook type
     }
 
     const auto configfilepath = Winook::FindConfigFilePath(hooktype);
     if (configfilepath.empty())
     {
+#if _DEBUG && LOGWINOOKLIB
+        Logger.WriteLine(TEXT("configfilepath.empty()") + std::wstring(dllfilepath));
+#endif
         return TRUE; // Assume out-of-context initialization
     }
 

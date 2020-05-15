@@ -7,7 +7,7 @@
 
 constexpr auto kPathBufferSize = 1024;
 
-#if defined(WINOOKLIBHOST64)
+#if defined(WINOOK64)
 const std::wstring kKeyboardHookLibName = std::wstring(TEXT("Winook.Lib.Keyboard.x64.dll"));
 const std::wstring kMouseHookLibName = std::wstring(TEXT("Winook.Lib.Mouse.x64.dll"));
 #else

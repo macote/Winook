@@ -114,6 +114,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     swprintf(hooklibpath, sizeof(hooklibpath), TEXT("%ls%ls"),
         modulefolder.c_str(), hooklibname.c_str());
 
+#if _DEBUG && LOGWINOOKLIBHOST
+    Logger.WriteLine(TEXT("hooklibpath: ") + std::wstring(hooklibpath));
+#endif
+
     const auto hooklib = LoadLibrary(hooklibpath);
     if (hooklib == NULL)
     {
