@@ -42,10 +42,10 @@
             var eventArgs = new KeyboardMessageEventArgs
             {
                 VirtualKeyCode = BitConverter.ToInt32(e.Bytes, 0),
-                Flags = BitConverter.ToInt32(e.Bytes, 4),
+                Flags = BitConverter.ToUInt32(e.Bytes, 4),
             };
 
-            Debug.WriteLine($"Keyboard Virtual Key Code: {eventArgs.VirtualKeyCode}; Flags: {eventArgs.Flags}");
+            Debug.WriteLine($"Keyboard Virtual Key Code: {eventArgs.VirtualKeyCode}; Flags: {eventArgs.Flags:x}");
 
             MessageReceived?.Invoke(this, eventArgs);
         }

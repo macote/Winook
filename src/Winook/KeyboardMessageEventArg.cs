@@ -6,7 +6,7 @@
     public class KeyboardMessageEventArgs : EventArgs
     {
         public int VirtualKeyCode;
-        public int Flags;
+        public uint Flags;
     }
 #pragma warning restore CA1051 // Do not declare visible instance fields
 }

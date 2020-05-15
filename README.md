@@ -38,7 +38,6 @@ Keyboard hooking works in a similar way.
 # Known Issues
 
 - The process bitness detection may fail. If the process bitness is known in advance, it is possible to specify it using an overloaded constructor.
-- Keyboard and mouse hooking cannot be used simultaneously.
 
 # License
 
