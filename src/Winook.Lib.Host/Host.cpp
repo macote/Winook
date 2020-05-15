@@ -25,7 +25,7 @@ extern "C" FILE * __cdecl __iob_func(void) { return _iob; }
 #endif
 #endif
 
-#define LOGWINOOKLIBHOST 0
+#define LOGWINOOKLIBHOST 1
 #if _DEBUG && LOGWINOOKLIBHOST
 #define LOGWINOOKLIBHOSTPATH TEXT("C:\\Temp\\WinookLibHost_")
 #include "DebugHelper.h"
@@ -122,11 +122,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     // Write configuration file
 
-    StreamLineWriter configfile(
-        Winook::GetConfigFilePath(processfullpath, hooklib, processid, threadid), 
-        false);
+    const auto configfilepath = Winook::GetConfigFilePath(processfullpath, processid, threadid, hooktype);
+    StreamLineWriter configfile(configfilepath, false);
     configfile.WriteLine(port);
     configfile.Close();
+#if _DEBUG && LOGWINOOKLIBHOST
+    Logger.WriteLine(TEXT("configfilepath: ") + configfilepath);
+#endif
 
     // Setup hook
 

@@ -161,7 +161,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Winook.Common\FileStream.cpp" />
-    <ClCompile Include="Source.cpp" />
+    <ClCompile Include="Lib.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Winook.Common\DebugHelper.h" />
@@ -171,7 +171,7 @@
     <ClInclude Include="..\Winook.Common\TimestampLogger.h" />
     <ClInclude Include="..\Winook.Common\Winook.h" />
     <ClInclude Include="MessageSender.h" />
-    <ClInclude Include="Source.h" />
+    <ClInclude Include="Lib.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source.def" />

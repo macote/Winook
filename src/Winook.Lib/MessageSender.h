@@ -4,7 +4,7 @@
 
 #include "asio.hpp"
 
-#define LOGWINOOKMESSAGESENDER 0
+#define LOGWINOOKMESSAGESENDER 1
 #if _DEBUG && LOGWINOOKMESSAGESENDER
 #define LOGWINOOKMESSAGESENDERPATH TEXT("C:\\Temp\\WinookMessageSender_")
 #include "DebugHelper.h"
@@ -36,7 +36,15 @@ inline void MessageSender::Connect(std::string port)
 {
     tcp::resolver resolver(io_context_);
     auto endpoints = resolver.resolve("127.0.0.1", port);
-    asio::connect(socket_, endpoints, ignorederror_);
+    std::error_code error;
+    asio::connect(
+        socket_, 
+        endpoints, 
+        error);
+    if (error)
+    {
+        // TODO: handle error
+    }
 }
 
 inline void MessageSender::SendMessage(void* data, size_t bytecount)

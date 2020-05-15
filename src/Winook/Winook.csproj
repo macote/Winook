@@ -67,10 +67,16 @@
     <Content Include="winook.support\Winook.Lib.Host.x86.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="winook.support\Winook.Lib.x64.dll">
+    <Content Include="winook.support\Winook.Lib.Keyboard.x64.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="winook.support\Winook.Lib.x86.dll">
+    <Content Include="winook.support\Winook.Lib.Keyboard.x86.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="winook.support\Winook.Lib.Mouse.x64.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="winook.support\Winook.Lib.Mouse.x86.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

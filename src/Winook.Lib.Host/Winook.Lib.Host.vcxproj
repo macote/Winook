@@ -183,7 +183,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Winook.Common\FileStream.cpp" />
-    <ClCompile Include="Source.cpp" />
+    <ClCompile Include="Host.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Winook.Lib.Host.rc" />

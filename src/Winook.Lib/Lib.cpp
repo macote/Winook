@@ -1,4 +1,4 @@
-#include "Source.h"
+#include "Lib.h"
 #include "Winook.h"
 #include "MessageSender.h"
 #include "StreamLineReader.h"
@@ -7,7 +7,7 @@
 #include <regex>
 #include <string>
 
-#define LOGWINOOKLIB 0
+#define LOGWINOOKLIB 1
 #if _DEBUG && LOGWINOOKLIB
 #define LOGWINOOKLIBPATH TEXT("C:\\Temp\\WinookLibHookProc_")
 #include "DebugHelper.h"
@@ -25,7 +25,11 @@ BOOL WINAPI DllMain(HINSTANCE hinst, DWORD fdwReason, LPVOID lpReserved)
 #if _DEBUG
         LogDllMain(hinst, TEXT("DLL_PROCESS_ATTACH"));
 #endif
-        Initialize(hinst);
+        if (!Initialize(hinst))
+        {
+            return FALSE;
+        }
+
         break;
 
     case DLL_THREAD_ATTACH:
@@ -50,28 +54,55 @@ BOOL WINAPI DllMain(HINSTANCE hinst, DWORD fdwReason, LPVOID lpReserved)
     return TRUE;
 }
 
-void Initialize(HINSTANCE hinst)
+BOOL Initialize(HINSTANCE hinst)
 {
     // Look for initialization file stored in %TEMP%
 
-    TCHAR modulepath[kPathBufferSize];
-    GetModuleFileName(NULL, modulepath, kPathBufferSize);
-    const auto configfilepath = Winook::GetConfigFilePath(modulepath, hinst, GetCurrentProcessId(), GetThreadId(GetCurrentThread()));
-    WIN32_FIND_DATA findfiledata;
-    const auto find = FindFirstFile(configfilepath.c_str(), &findfiledata);
-    if (find != INVALID_HANDLE_VALUE)
+    HMODULE module;
+    if (!GetModuleHandleEx(
+        GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+        (LPCTSTR)Initialize,
+        &module))
     {
-        FindClose(find);
-        StreamLineReader configfile(configfilepath);
-        const auto port = std::stoi(configfile.ReadLine());
-        configfile.Close();
-        DeleteFile(configfilepath.c_str());
-        messagesender.Connect(std::to_string(port));
+        return FALSE;
+    }
+
+    TCHAR dllfilepath[kPathBufferSize];
+    GetModuleFileName(module, dllfilepath, kPathBufferSize);
+#if _DEBUG && LOGWINOOKLIB
+    Logger.WriteLine(TEXT("dllfilepath: ") + std::wstring(dllfilepath));
+#endif
+    int hooktype{};
+    if (StrStrIW(dllfilepath, kKeyboardHookLibName.c_str()) != NULL)
+    {
+        hooktype = WH_KEYBOARD;
+    }
+    else if (StrStrIW(dllfilepath, kMouseHookLibName.c_str()) != NULL)
+    {
+        hooktype = WH_MOUSE;
     }
     else
     {
-        // TODO: handle error
+        return FALSE; // Unsupported hook type
     }
+
+    const auto configfilepath = Winook::FindConfigFilePath(hooktype);
+    if (configfilepath.empty())
+    {
+        return TRUE; // Assume out-of-context initialization
+    }
+
+#if _DEBUG && LOGWINOOKLIB
+    Logger.WriteLine(TEXT("configfilepath: ") + configfilepath);
+#endif
+
+    StreamLineReader configfile(configfilepath);
+    const auto port = std::stoi(configfile.ReadLine());
+    configfile.Close();
+    DeleteFile(configfilepath.c_str());
+    messagesender.Connect(std::to_string(port));
+
+    return TRUE;
 }
 
 #if _DEBUG

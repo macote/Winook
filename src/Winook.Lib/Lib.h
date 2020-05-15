@@ -4,6 +4,7 @@
 #define WIN32_LEAN_AND_MEAN
 
 #include <Windows.h>
+#include <Shlwapi.h>
 
 #include <string>
 
@@ -25,7 +26,7 @@ struct HookKeyboardMessage
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved);
 
-void Initialize(HINSTANCE hinst);
+BOOL Initialize(HINSTANCE hinst);
 
 #if _DEBUG
 void LogDllMain(HINSTANCE hinst, std::wstring reason);

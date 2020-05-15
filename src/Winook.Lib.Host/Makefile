@@ -13,7 +13,7 @@ endif
 
 WINDRES = windres
 
-OBJECTS = obj/Source.o obj/FileStream.o obj/Winook.Lib.Host.o
+OBJECTS = obj/Host.o obj/FileStream.o obj/Winook.Lib.Host.o
 
 ifeq (${DUMPMACHINE},x86_64-w64-mingw32) 
 	CFLAGS = -m64 -std=c++17 -I../Winook.Common -DWINVER=0x0603 -D_WIN32_WINNT=0x0603 -DUNICODE -D_UNICODE -DWINOOKLIBHOST64 -D_FORTIFY_SOURCE=2 -D_GLIBCXX_ASSERTIONS -O2 ${WARNS} -fmessage-length=0 -fasynchronous-unwind-tables
