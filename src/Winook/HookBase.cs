@@ -22,7 +22,8 @@
         private readonly int _processId;
         private readonly MessageReceiver _messageReceiver;
         private readonly HookType _hookType;
-        private Process _libHostProcess;
+        private Process _libHostProcess32;
+        private Process _libHostProcess64;
         private ManualResetEvent _libHostMutexReleaseEvent;
         private ProcessBitness _processBitness;
         private bool _disposed = false;
@@ -80,13 +81,18 @@
                 acquireEvent.WaitOne();
             }
 
-            var libHostExtension = (is64BitProcess ? ".x64" : ".x86") + ".exe";
-            var libHostExeName = $"{LibHostExeBaseName}{libHostExtension}";
+            var libHostExeName = $"{LibHostExeBaseName}.x86.exe";
             var libHostExePath = Path.Combine(Helper.GetExecutingAssemblyDirectory(), libHostExeName);
+            _libHostProcess32 = Process.Start(libHostExePath, $"{(int)_hookType} {_messageReceiver.Port} {_processId} {libHostMutexGuid}");
 
             Debug.WriteLine($"{libHostExeName} args: {(int)_hookType} {_messageReceiver.Port} {_processId} {libHostMutexGuid}");
 
-            _libHostProcess = Process.Start(libHostExePath, $"{(int)_hookType} {_messageReceiver.Port} {_processId} {libHostMutexGuid}");
+            if (Environment.Is64BitOperatingSystem)
+            {
+                var libHost64ExeName = $"{LibHostExeBaseName}.x64.exe";
+                var libHost64ExePath = Path.Combine(Helper.GetExecutingAssemblyDirectory(), libHost64ExeName);
+                _libHostProcess64 = Process.Start(libHost64ExePath, $"{(int)_hookType} {_messageReceiver.Port} {_processId} {libHostMutexGuid}");
+            }
 
             // TODO: check for lib host errors
             // TODO: add a hook confirmation by validating an init message sent from lib
@@ -111,7 +117,8 @@
                 if (disposing)
                 {
                     ReleaseAndDisposeMutex();
-                    _libHostProcess?.Dispose();
+                    _libHostProcess32?.Dispose();
+                    _libHostProcess64?.Dispose();
                     _messageReceiver.Dispose();
                 }
 

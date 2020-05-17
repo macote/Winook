@@ -48,49 +48,144 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     // Get process full path
 
+#if _DEBUG && LOGWINOOKLIBHOST
+    Logger.WriteLine(TEXT("OpenProcess()"));
+#endif
     const auto process = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processid);
     if (process == NULL)
+    {
+#if _DEBUG && LOGWINOOKLIBHOST
+        Logger.WriteLine(TEXT("OpenProcess() failed."));
+#endif
+        return EXIT_FAILURE;
+    }
+
+    BOOL isx64os{};
+    SYSTEM_INFO systeminfo;
+    GetNativeSystemInfo(&systeminfo);
+    if (systeminfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64)
+    {
+#if _DEBUG && LOGWINOOKLIBHOST
+        Logger.WriteLine(TEXT("PROCESSOR_ARCHITECTURE_AMD64"));
+#endif
+        isx64os = TRUE;
+    }
+    else if (systeminfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_INTEL)
+    {
+#if _DEBUG && LOGWINOOKLIBHOST
+        Logger.WriteLine(TEXT("PROCESSOR_ARCHITECTURE_INTEL"));
+#endif
+    }
+    else
     {
         return EXIT_FAILURE;
     }
 
+    BOOL iswow64process;
+#if _DEBUG && LOGWINOOKLIBHOST
+    Logger.WriteLine(TEXT("IsWow64Process()"));
+#endif
+    if (!IsWow64Process(process, &iswow64process))
+    {
+#if _DEBUG && LOGWINOOKLIBHOST
+        Logger.WriteLine(TEXT("IsWow64Process() failed."));
+#endif
+        return EXIT_FAILURE;
+    }
+
+#if defined WINOOK64
+    const auto isx64binary = TRUE;
+#else
+    const auto isx64binary = FALSE;
+#endif
+
+    if (isx64binary)
+    {
+        if (iswow64process)
+        {
+            // Let the 32-bit version handle the hook
+#if _DEBUG && LOGWINOOKLIBHOST
+            Logger.WriteLine(TEXT("isx64binary && iswow64process"));
+#endif
+            return EXIT_SUCCESS;
+        }
+    }
+    else if (isx64os && !iswow64process)
+    {
+        // Let the 64-bit version handle the hook
+#if _DEBUG && LOGWINOOKLIBHOST
+        Logger.WriteLine(TEXT("!isx64binary && isx64os && !iswow64process"));
+#endif
+        return EXIT_SUCCESS;
+    }
+ 
     TCHAR processfullpath[kPathBufferSize];
     DWORD processfullpathsize = sizeof(processfullpath);
+#if _DEBUG && LOGWINOOKLIBHOST
+    Logger.WriteLine(TEXT("QueryFullProcessImageName()"));
+#endif
     if (!QueryFullProcessImageName(process, 0, processfullpath, &processfullpathsize))
     {
+#if _DEBUG && LOGWINOOKLIBHOST
+        Logger.WriteLine(TEXT("QueryFullProcessImageName() failed."));
+#endif
         return EXIT_FAILURE;
     }
 
     // Ensure its main window is ready
 
+#if _DEBUG && LOGWINOOKLIBHOST
+    Logger.WriteLine(TEXT("WaitForInputIdle()"));
+#endif
     const auto waitresult = WaitForInputIdle(process, PROCESS_WAITFORINPUTIDLE_TIMEOUT_INTERVAL_IN_MILLISECONDS);
     CloseHandle(process);
 
     if (waitresult == WAIT_FAILED)
     {
+#if _DEBUG && LOGWINOOKLIBHOST
+        Logger.WriteLine(TEXT("WaitForInputIdle() failed."));
+#endif
         return EXIT_FAILURE;
     }
 
     // Find process main window thread id
 
     MainWindowFinder mainwindowfinder(processid);
+#if _DEBUG && LOGWINOOKLIBHOST
+    Logger.WriteLine(TEXT("FindMainWindow()"));
+#endif
     const auto mainwindowhandle = mainwindowfinder.FindMainWindow();
     if (mainwindowhandle == NULL)
     {
+#if _DEBUG && LOGWINOOKLIBHOST
+        Logger.WriteLine(TEXT("FindMainWindow() failed."));
+#endif
         return EXIT_FAILURE;
     }
 
+#if _DEBUG && LOGWINOOKLIBHOST
+    Logger.WriteLine(TEXT("GetWindowThreadProcessId()"));
+#endif
     const auto threadid = GetWindowThreadProcessId(mainwindowhandle, NULL);
     if (threadid == 0)
     {
+#if _DEBUG && LOGWINOOKLIBHOST
+        Logger.WriteLine(TEXT("GetWindowThreadProcessId() failed."));
+#endif
         return EXIT_FAILURE;
     }
 
     // Get lib path
 
     TCHAR modulepath[kPathBufferSize];
+#if _DEBUG && LOGWINOOKLIBHOST
+    Logger.WriteLine(TEXT("GetModuleFileName()"));
+#endif
     if (!GetModuleFileName(NULL, modulepath, kPathBufferSize))
     {
+#if _DEBUG && LOGWINOOKLIBHOST
+        Logger.WriteLine(TEXT("GetModuleFileName() failed."));
+#endif
         return EXIT_FAILURE;
     }
 
@@ -118,9 +213,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     Logger.WriteLine(TEXT("hooklibpath: ") + std::wstring(hooklibpath));
 #endif
 
+#if _DEBUG && LOGWINOOKLIBHOST
+    Logger.WriteLine(TEXT("LoadLibrary()"));
+#endif
     const auto hooklib = LoadLibrary(hooklibpath);
     if (hooklib == NULL)
     {
+#if _DEBUG && LOGWINOOKLIBHOST
+        Logger.WriteLine(TEXT("LoadLibrary() failed."));
+#endif
         return EXIT_FAILURE;
     }
 
@@ -150,15 +251,27 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         return EXIT_FAILURE;
     }
    
+#if _DEBUG && LOGWINOOKLIBHOST
+    Logger.WriteLine(TEXT("GetProcAddress()"));
+#endif
     const auto hookproc = (HOOKPROC)GetProcAddress(hooklib, hookprocname.c_str());
     if (hookproc == NULL)
     {
+#if _DEBUG && LOGWINOOKLIBHOST
+        Logger.WriteLine(TEXT("GetProcAddress() failed."));
+#endif
         return EXIT_FAILURE;
     }
 
+#if _DEBUG && LOGWINOOKLIBHOST
+    Logger.WriteLine(TEXT("SetWindowsHookEx()"));
+#endif
     const auto hook = SetWindowsHookEx(hooktype, hookproc, hooklib, threadid);
     if (hook == NULL)
     {
+#if _DEBUG && LOGWINOOKLIBHOST
+        Logger.WriteLine(TEXT("SetWindowsHookEx() failed."));
+#endif
         return EXIT_FAILURE;
     }
 
@@ -166,9 +279,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     TCHAR mutexname[256];
     swprintf(mutexname, sizeof(mutexname), TEXT("Global\\%ls"), mutexguid.c_str());
+#if _DEBUG && LOGWINOOKLIBHOST
+    Logger.WriteLine(TEXT("OpenMutex()"));
+#endif
     const auto mutex = OpenMutex(SYNCHRONIZE, FALSE, mutexname);
     if (mutex == NULL)
     {
+#if _DEBUG && LOGWINOOKLIBHOST
+        Logger.WriteLine(TEXT("OpenMutex() failed."));
+#endif
         return EXIT_FAILURE;
     }
 
