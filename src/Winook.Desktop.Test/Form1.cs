@@ -16,6 +16,10 @@
         public Form1()
         {
             InitializeComponent();
+            if (!Environment.Is64BitOperatingSystem)
+            {
+                radio64bit.Enabled = false;
+            }
         }
 
         private void mouseButton_Click(object sender, EventArgs e)
@@ -24,7 +28,7 @@
             {
                 if (_process == null || _process.HasExited)
                 {
-                    if (radio32bit.Checked)
+                    if (Environment.Is64BitOperatingSystem && radio32bit.Checked)
                     {
                         _process = Process.Start(@"c:\windows\syswow64\notepad.exe");
                     }
@@ -61,7 +65,7 @@
             {
                 if (_process == null || _process.HasExited)
                 {
-                    if (radio32bit.Checked)
+                    if (Environment.Is64BitOperatingSystem && radio32bit.Checked)
                     {
                         _process = Process.Start(@"c:\windows\syswow64\notepad.exe");
                     }
