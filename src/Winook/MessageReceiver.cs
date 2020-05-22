@@ -61,27 +61,31 @@
                 try
                 {
                     var bytes = new byte[_messageByteSize];
-                    using var client = _tcpListener.AcceptTcpClient();
-                    using var stream = client.GetStream();
-                    int bytecount, offset = 0;
-                    while ((bytecount = stream.Read(bytes, offset, bytes.Length - offset)) != 0)
+                    using (var client = _tcpListener.AcceptTcpClient())
                     {
-                        if (bytecount + offset == _messageByteSize)
+                        using (var stream = client.GetStream())
                         {
-                            offset = 0;
-                            MessageReceived(this, new MessageEventArgs
+                            int bytecount, offset = 0;
+                            while ((bytecount = stream.Read(bytes, offset, bytes.Length - offset)) != 0)
                             {
-                                Bytes = bytes
-                            });
-                        }
-                        else
-                        {
-                            offset = bytecount;
-                        }
+                                if (bytecount + offset == _messageByteSize)
+                                {
+                                    offset = 0;
+                                    MessageReceived(this, new MessageEventArgs
+                                    {
+                                        Bytes = bytes
+                                    });
+                                }
+                                else
+                                {
+                                    offset = bytecount;
+                                }
 
-                        if (_cancellationToken.IsCancellationRequested)
-                        {
-                            break;
+                                if (_cancellationToken.IsCancellationRequested)
+                                {
+                                    break;
+                                }
+                            }
                         }
                     }
                 }

@@ -9,21 +9,6 @@
     {
         #region Methods
 
-        internal static bool Is64BitProcess(IntPtr processHandle)
-        {
-            if (!Environment.Is64BitOperatingSystem)
-            {
-                return false;
-            }
-
-            if (!NativeMethods.IsWow64Process(processHandle, out bool wow64Process))
-            {
-                throw new Win32Exception();
-            }
-
-            return !wow64Process;
-        }
-
         internal static string GetExecutingAssemblyDirectory()
         {
             var codeBase = Assembly.GetExecutingAssembly().CodeBase;

@@ -22,12 +22,7 @@
         #region Constructors
 
         public KeyboardHook(int processId)
-            : this(processId, ProcessBitness.Unknown)
-        {
-        }
-
-        public KeyboardHook(int processId, ProcessBitness processBitness)
-            : base(processId, processBitness, KeyboardHookType, HookMessageSizeInBytes)
+            : base(processId, KeyboardHookType, HookMessageSizeInBytes)
         {
         }
 
