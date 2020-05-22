@@ -8,10 +8,14 @@ public:
     MainWindowFinder(DWORD processid) : processid_(processid) { }
     HWND FindMainWindow()
     {
-        EnumWindows(EnumWindowsCallback, (LONG_PTR)this);
+        if (!EnumWindows(EnumWindowsCallback, (LONG_PTR)this))
+        {
+            lasterror_ = GetLastError();
+        }
 
         return besthandle_;
     }
+    DWORD lasterror() const { return lasterror_; }
 private:
     static BOOL CALLBACK EnumWindowsCallback(HWND handle, LONG_PTR mwf)
     {
@@ -34,4 +38,5 @@ private:
 private:
     DWORD processid_{};
     HWND besthandle_{ NULL };
+    DWORD lasterror_{};
 };

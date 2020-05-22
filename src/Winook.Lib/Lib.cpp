@@ -7,6 +7,8 @@
 #include <regex>
 #include <string>
 
+#pragma comment (lib, "shlwapi.lib")
+
 #define LOGWINOOKLIB 1
 #if _DEBUG && LOGWINOOKLIB
 #define LOGWINOOKLIBPATH TEXT("C:\\Temp\\WinookLibHookProc_")
