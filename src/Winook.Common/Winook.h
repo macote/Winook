@@ -51,7 +51,7 @@ private:
     void LoadLib();
     void WriteConfigurationFile();
     void SetupHook();
-    void WaitOnHookMutex();
+    void WaitOnHostMutex();
     void LogError(std::string errormessage);
     void HandleError(std::string errormessage);
     void HandleError(std::string errormessage, DWORD errorcode);
@@ -173,6 +173,11 @@ inline void Winook::Hook()
     GetProcessFullPath();
     WaitForProcess();
     FindProcessMainWindowThreadId();
+    GetLibPath();
+    LoadLib();
+    WriteConfigurationFile();
+    SetupHook();
+    WaitOnHostMutex();
 }
 
 inline void Winook::GetProcessFullPath()
@@ -209,8 +214,8 @@ inline void Winook::FindProcessMainWindowThreadId()
         HandleError("FindMainWindow() failed", mainwindowfinder.lasterror());
     }
 
-    const auto threadid = GetWindowThreadProcessId(mainwindowhandle, NULL);
-    if (threadid == 0)
+    threadid_ = GetWindowThreadProcessId(mainwindowhandle, NULL);
+    if (threadid_ == 0)
     {
         HandleError("GetWindowThreadProcessId() failed", GetLastError());
     }
@@ -249,8 +254,8 @@ inline void Winook::GetLibPath()
 
 inline void Winook::LoadLib()
 {
-    const auto hooklib = LoadLibrary(hooklibpath_.c_str());
-    if (hooklib == NULL)
+    hooklib_ = LoadLibrary(hooklibpath_.c_str());
+    if (hooklib_ == NULL)
     {
         HandleError("LoadLibrary() failed", GetLastError());
     }    
@@ -286,14 +291,14 @@ inline void Winook::SetupHook()
         HandleError("GetProcAddress() failed", GetLastError());
     }
 
-    const auto hook = SetWindowsHookEx(hooktype_, hookproc, hooklib_, threadid_);
-    if (hook == NULL)
+    hook_ = SetWindowsHookEx(hooktype_, hookproc, hooklib_, threadid_);
+    if (hook_ == NULL)
     {
         HandleError("SetWindowsHookEx() failed", GetLastError());
     }
 }
 
-inline void Winook::WaitOnHookMutex()
+inline void Winook::WaitOnHostMutex()
 {
     TCHAR mutexname[256];
     swprintf(mutexname, sizeof(mutexname), TEXT("Global\\%ls"), mutexguid_.c_str());
