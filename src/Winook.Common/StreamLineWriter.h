@@ -51,7 +51,7 @@ inline void StreamLineWriter::Write(const std::string& line)
         if (encoding_ == Encoding::UTF8)
         {
             char const* c = line.c_str();
-            filestream_.Write(reinterpret_cast<PBYTE>(const_cast<char *>(c)), line.size());
+            filestream_.Write(reinterpret_cast<PBYTE>(const_cast<char *>(c)), static_cast<DWORD>(line.size()));
         }
         else
         {

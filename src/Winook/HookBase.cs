@@ -11,6 +11,7 @@
         #region Fields
 
         private const string LibHostExeBaseName = "winook.support\\Winook.Lib.Host";
+        private const int InitializationTimeoutInMilliseconds = 1000;
 
         private readonly int _processId;
         private readonly MessageReceiver _messageReceiver;
@@ -70,7 +71,57 @@
                 _libHostProcess64 = Process.Start(libHost64ExePath, $"{(int)_hookType} {_messageReceiver.Port} {_processId} {libHostMutexGuid}");
             }
 
-            // TODO: check for lib host errors
+            var stopwatch = Stopwatch.StartNew();
+            var exitCode = 0;
+            var exitCode64 = 0;
+            var hostRunning = false;
+            var host64Running = false;
+            using (var signal64 = new ManualResetEvent(false))
+            {
+                if (Environment.Is64BitOperatingSystem)
+                {
+                    Task.Run(() =>
+                    {
+                        if (!_libHostProcess64.WaitForExit(InitializationTimeoutInMilliseconds))
+                        {
+                            host64Running = true;
+                        }
+                        else
+                        {
+                            exitCode64 = _libHostProcess64.ExitCode;
+                        }
+                        signal64.Set();
+                    });
+                }
+                else
+                {
+                    signal64.Set();
+                }
+
+                if (!_libHostProcess.WaitForExit(InitializationTimeoutInMilliseconds))
+                {
+                    hostRunning = true;
+                }
+                else
+                {
+                    exitCode = _libHostProcess.ExitCode;
+                }
+
+                signal64.WaitOne();
+
+                if (exitCode != 0 || exitCode64 != 0)
+                {
+                }
+                else if (hostRunning && host64Running)
+                {
+                }
+
+                Debug.WriteLine($"exitCode: {exitCode}; exitCode64: {exitCode64}");
+                Debug.WriteLine($"hostRunning: {hostRunning}; host64Running: {host64Running}");
+            }
+
+            Debug.WriteLine($"elapsed: {stopwatch.ElapsedMilliseconds}");
+
             // TODO: add a hook confirmation by validating an init message sent from lib
         }
 

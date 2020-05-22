@@ -124,19 +124,18 @@ inline BOOL Winook::IsBitnessMatch()
     BOOL isx64os{};
     SYSTEM_INFO systeminfo;
     GetNativeSystemInfo(&systeminfo);
-    if (systeminfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64
-        || systeminfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_ARM64)
+    switch (systeminfo.wProcessorArchitecture)
     {
+    case PROCESSOR_ARCHITECTURE_AMD64:
+    case PROCESSOR_ARCHITECTURE_ARM64:
         isx64os = TRUE;
-    }
-    else if (systeminfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_ARM
-        || systeminfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_INTEL)
-    {
-    }
-    else
-    {
-        // Unsupported architecture
+        break;
+    case PROCESSOR_ARCHITECTURE_ARM:
+    case PROCESSOR_ARCHITECTURE_INTEL:
+        break;
+    default:
         HandleError("Unsupported processor architecture");
+        break;
     }
 
     BOOL iswow64process;
@@ -194,7 +193,7 @@ inline void Winook::GetProcessFullPath()
 
 inline void Winook::WaitForProcess()
 {
-    // Ensure process' main window is ready
+    // Ensure target process' main window is ready
     const auto waitresult = WaitForInputIdle(process_, kProcessWaitForInputIdleTimeoutIntervalInMilliseconds);
     CloseHandle(process_);
     process_ = NULL;
@@ -246,8 +245,7 @@ inline void Winook::GetLibPath()
         HandleError("Invalid hook type");
     }
 
-    swprintf(libpath, sizeof(libpath), TEXT("%ls%ls"),
-        modulefolder.c_str(), libname.c_str());
+    swprintf(libpath, sizeof(libpath), TEXT("%ls%ls"), modulefolder.c_str(), libname.c_str());
     
     hooklibpath_ = libpath;
 }
@@ -323,15 +321,10 @@ inline void Winook::HandleError(std::string errormessage)
 inline void Winook::HandleError(std::string errormessage, DWORD errorcode)
 {
     std::stringstream ss;
+    ss << errormessage;
     if (errorcode > 0)
     {
-        ss << errormessage << " (";
-        ss << "0x" << std::hex << std::setw(8) << std::setfill('0') << std::uppercase;
-        ss << errorcode << ")";
-    }
-    else
-    {
-        ss << errormessage;
+        ss << " (0x" << std::hex << std::uppercase << errorcode << ")";
     }
 
     const auto formattederrormessage = ss.str();
