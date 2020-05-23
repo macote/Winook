@@ -22,7 +22,7 @@
             }
         }
 
-        private void mouseButton_Click(object sender, EventArgs e)
+        private async void mouseButton_Click(object sender, EventArgs e)
         {
             if (!_mouseHookInstalled)
             {
@@ -40,7 +40,8 @@
 
                 _mouseHook = new MouseHook(_process.Id);
                 _mouseHook.MessageReceived += MouseHook_MessageReceived;
-                _mouseHook.Install();
+                mouseButton.Text = "Installing hook...";
+                await _mouseHook.InstallAsync();
                 _mouseHookInstalled = true;
                 mouseButton.Text = "Mouse Unhook";
             }
@@ -59,7 +60,7 @@
             });
         }
 
-        private void keyboardButton_Click(object sender, EventArgs e)
+        private async void keyboardButton_Click(object sender, EventArgs e)
         {
             if (!_keyboardHookInstalled)
             {
@@ -77,7 +78,8 @@
 
                 _keyboardHook = new KeyboardHook(_process.Id);
                 _keyboardHook.MessageReceived += KeyboardHook_MessageReceived;
-                _keyboardHook.Install();
+                keyboardButton.Text = "Installing hook...";
+                await _keyboardHook.InstallAsync();
                 _keyboardHookInstalled = true;
                 keyboardButton.Text = "Keyboard Unhook";
             }

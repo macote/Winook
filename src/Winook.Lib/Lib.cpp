@@ -7,6 +7,10 @@
 #include <regex>
 #include <string>
 
+#if !defined(__MINGW32__)
+#pragma comment (lib, "shlwapi.lib")
+#endif
+
 #define LOGWINOOKLIB 1
 #if _DEBUG && LOGWINOOKLIB
 #define LOGWINOOKLIBPATH TEXT("C:\\Temp\\WinookLibHookProc_")
@@ -69,9 +73,6 @@ BOOL Initialize(HINSTANCE hinst)
 
     TCHAR dllfilepath[kPathBufferSize];
     GetModuleFileName(module, dllfilepath, kPathBufferSize);
-#if _DEBUG && LOGWINOOKLIB
-    Logger.WriteLine(TEXT("dllfilepath: ") + std::wstring(dllfilepath));
-#endif
     int hooktype{};
     if (StrStrI(dllfilepath, kKeyboardHookLibName.c_str()) != NULL)
     {
@@ -83,24 +84,14 @@ BOOL Initialize(HINSTANCE hinst)
     }
     else
     {
-#if _DEBUG && LOGWINOOKLIB
-        Logger.WriteLine(TEXT("Unsupported hook type."));
-#endif
         return FALSE; // Unsupported hook type
     }
 
     const auto configfilepath = Winook::FindConfigFilePath(hooktype);
     if (configfilepath.empty())
     {
-#if _DEBUG && LOGWINOOKLIB
-        Logger.WriteLine(TEXT("configfilepath.empty()") + std::wstring(dllfilepath));
-#endif
         return TRUE; // Assume out-of-context initialization
     }
-
-#if _DEBUG && LOGWINOOKLIB
-    Logger.WriteLine(TEXT("configfilepath: ") + configfilepath);
-#endif
 
     StreamLineReader configfile(configfilepath);
     const auto port = std::stoi(configfile.ReadLine());
@@ -111,24 +102,10 @@ BOOL Initialize(HINSTANCE hinst)
     return TRUE;
 }
 
-#if _DEBUG
-void LogDllMain(HINSTANCE hinst, std::wstring reason)
-{
-#if LOGWINOOKLIB
-    std::wstringstream wss;
-    wss << std::setw(16) << std::setfill(L'0') << std::hex << hinst;
-    TCHAR procInfo[256];
-    swprintf(procInfo, sizeof(procInfo), TEXT("Instance: %lx; Reason: %ls; ProcessId: %d; ThreadId: %d"), 
-        PtrToLong(hinst), reason.c_str(), GetCurrentProcessId(), GetThreadId(GetCurrentThread()));
-    Logger.WriteLine(procInfo);
-#endif
-}
-#endif
-
 LRESULT CALLBACK KeyboardHookProc(int code, WPARAM wParam, LPARAM lParam)
 {
-#if _DEBUG && LOGWINOOKLIB
-    Logger.WriteLine(DebugHelper::FormatKeyboardHookMessage(code, wParam, lParam));
+#if _DEBUG
+    LogDll(DebugHelper::FormatKeyboardHookMessage(code, wParam, lParam));
 #endif
     if (code == HC_ACTION)
     {
@@ -143,12 +120,12 @@ LRESULT CALLBACK KeyboardHookProc(int code, WPARAM wParam, LPARAM lParam)
 
 LRESULT CALLBACK MouseHookProc(int code, WPARAM wParam, LPARAM lParam) 
 {
-#if _DEBUG && LOGWINOOKLIB
-    Logger.WriteLine(DebugHelper::FormatMouseHookMessage(code, wParam, lParam));
+#if _DEBUG
+    LogDll(DebugHelper::FormatMouseHookMessage(code, wParam, lParam));
 #endif
     if (code == HC_ACTION)
     {
-        HookMouseMessage hmm{};
+        HookMouseMessage hmm;
         hmm.messageCode = (DWORD)wParam;
         if (wParam == WM_MOUSEWHEEL)
         {
@@ -173,3 +150,24 @@ LRESULT CALLBACK MouseHookProc(int code, WPARAM wParam, LPARAM lParam)
 
     return CallNextHookEx(NULL, code, wParam, lParam);
 }
+
+#if _DEBUG
+void LogDll(std::wstring message)
+{
+#if LOGWINOOKLIB
+    Logger.WriteLine(message);
+#endif
+}
+
+void LogDllMain(HINSTANCE hinst, std::wstring reason)
+{
+#if LOGWINOOKLIB
+    std::wstringstream wss;
+    wss << std::setw(16) << std::setfill(L'0') << std::hex << hinst;
+    TCHAR procInfo[256];
+    swprintf(procInfo, sizeof(procInfo), TEXT("Instance: %lx; Reason: %ls; ProcessId: %d; ThreadId: %d"),
+        PtrToLong(hinst), reason.c_str(), GetCurrentProcessId(), GetThreadId(GetCurrentThread()));
+    Logger.WriteLine(procInfo);
+#endif
+}
+#endif

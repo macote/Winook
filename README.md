@@ -5,19 +5,18 @@
 [nuget-badge]: https://img.shields.io/badge/nuget-v0.1.0-blue.svg
 [nuget-url]: https://www.nuget.org/packages/Winook
 
-Winook is a Windows library that let you install thread-level hooks inside processes.
+Winook is a Windows library that let you install thread-level hooks inside processes. This library offers an alternative to solutions that use global hooks. With thread-level hooks, performance and management issues can be avoided.
 
 # Information
 
-Winook uses a host process and dll injection to setup hooks.
+Winook uses host processes and dll injection to setup hooks. Both 32-bit and 64-bit support host applications and dlls are included. Bitness awareness is supported dynamically.
 
 # Installation
 
 ## NuGet
 
-Winook is currently in pre-release stage.
 ```
-Install-Package -IncludePrerelease Winook
+Install-Package Winook
 ```
 
 # Usage
@@ -28,7 +27,7 @@ _process = Process.Start(@"c:\windows\notepad.exe");
 
 _mouseHook = new MouseHook(_process.Id);
 _mouseHook.MessageReceived += MouseHook_MessageReceived;
-_mouseHook.Install();
+_mouseHook.InstallAsync();
 
 ...
 

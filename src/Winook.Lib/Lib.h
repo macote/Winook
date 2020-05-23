@@ -29,6 +29,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved);
 BOOL Initialize(HINSTANCE hinst);
 
 #if _DEBUG
+void LogDll(std::wstring message);
 void LogDllMain(HINSTANCE hinst, std::wstring reason);
 #endif
 

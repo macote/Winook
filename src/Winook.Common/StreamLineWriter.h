@@ -26,6 +26,8 @@ public:
     }
     BOOL autoflush() const { return autoflush_; };
     void set_autoflush(BOOL autoflush) { autoflush_ = autoflush; };
+    void Write(const std::string& line);
+    void WriteLine(const std::string& line);
     void Write(const std::wstring& line);
     void WriteLine(const std::wstring& line);
     void Close()
@@ -41,6 +43,22 @@ private:
     Encoding encoding_;
     BOOL autoflush_{};
 };
+
+inline void StreamLineWriter::Write(const std::string& line)
+{
+    if (line.size() > 0)
+    {
+        if (encoding_ == Encoding::UTF8)
+        {
+            char const* c = line.c_str();
+            filestream_.Write(reinterpret_cast<PBYTE>(const_cast<char *>(c)), static_cast<DWORD>(line.size()));
+        }
+        else
+        {
+            throw std::runtime_error("StreamLineWriter::Write() error: the selected encoding is not supported.");
+        }
+    }
+}
 
 inline void StreamLineWriter::Write(const std::wstring& line)
 {
@@ -58,6 +76,16 @@ inline void StreamLineWriter::Write(const std::wstring& line)
         {
             throw std::runtime_error("StreamLineWriter::Write() error: the selected encoding is not supported.");
         }
+    }
+}
+
+inline void StreamLineWriter::WriteLine(const std::string& line)
+{
+    Write(line);
+    WriteEOL();
+    if (autoflush_)
+    {
+        filestream_.Flush();
     }
 }
 
