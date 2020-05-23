@@ -1,7 +1,6 @@
 ﻿namespace Winook
 {
     using System;
-    using System.ComponentModel;
     using System.IO;
     using System.Reflection;
 

@@ -10,15 +10,17 @@
     {
         #region Fields
 
-        private const string LibHostExeBaseName = "winook.support\\Winook.Lib.Host";
-        private const int InitializationTimeoutInMilliseconds = 1000;
+        private const string LibHostBaseName = "winook.support\\Winook.Lib.Host";
+        private const int InitializationTimeout1InMilliseconds = 222;
+        private const int InitializationTimeout2InMilliseconds = 1111;
+        private const int InitializationTimeout3InMilliseconds = 3333;
 
         private readonly int _processId;
         private readonly MessageReceiver _messageReceiver;
         private readonly HookType _hookType;
         private Process _libHostProcess;
         private Process _libHostProcess64;
-        private ManualResetEvent _libHostMutexReleaseEvent;
+        private ManualResetEventSlim _libHostMutexReleaseEvent;
         private bool _disposed = false;
 
         #endregion
@@ -37,95 +39,79 @@
 
         #region Methods
 
-        public virtual void Install()
+        public async Task InstallAsync()
         {
             _messageReceiver.StartListening();
 
             var libHostMutexGuid = Guid.NewGuid().ToString();
             var libHostMutexName = $"Global\\{libHostMutexGuid}";
-            using (var acquireEvent = new ManualResetEvent(false))
+            using (var acquireEvent = new ManualResetEventSlim(false))
             {
-                _libHostMutexReleaseEvent = new ManualResetEvent(false);
-                Task.Run(() =>
-                {
-                    using (var mutex = new Mutex(true, libHostMutexName, out bool _))
-                    {
-                        acquireEvent.Set();
-                        _libHostMutexReleaseEvent.WaitOne();
-                        mutex.ReleaseMutex(); // Let host process unhook and terminate
+                _libHostMutexReleaseEvent = new ManualResetEventSlim(false);
+                _ = Task.Run(() =>
+                  {
+                      using (var mutex = new Mutex(true, libHostMutexName, out _))
+                      {
+                          acquireEvent.Set();
+                          _libHostMutexReleaseEvent.Wait();
+                          mutex.ReleaseMutex(); // Let host process unhook and terminate
                     }
-                });
-                acquireEvent.WaitOne();
+                  });
+                acquireEvent.Wait();
             }
 
-            var libHostExeName = $"{LibHostExeBaseName}.x86.exe";
-            var libHostExePath = Path.Combine(Helper.GetExecutingAssemblyDirectory(), libHostExeName);
-            _libHostProcess = Process.Start(libHostExePath, $"{(int)_hookType} {_messageReceiver.Port} {_processId} {libHostMutexGuid}");
+            var libHostName = $"{LibHostBaseName}.x86.exe";
+            var libHostPath = Path.Combine(Helper.GetExecutingAssemblyDirectory(), libHostName);
+            _libHostProcess = Process.Start(libHostPath, $"{(int)_hookType} {_messageReceiver.Port} {_processId} {libHostMutexGuid}");
 
-            Debug.WriteLine($"{libHostExeName} args: {(int)_hookType} {_messageReceiver.Port} {_processId} {libHostMutexGuid}");
+            Debug.WriteLine($"{libHostName} args: {(int)_hookType} {_messageReceiver.Port} {_processId} {libHostMutexGuid}");
 
             if (Environment.Is64BitOperatingSystem)
             {
-                var libHost64ExeName = $"{LibHostExeBaseName}.x64.exe";
-                var libHost64ExePath = Path.Combine(Helper.GetExecutingAssemblyDirectory(), libHost64ExeName);
-                _libHostProcess64 = Process.Start(libHost64ExePath, $"{(int)_hookType} {_messageReceiver.Port} {_processId} {libHostMutexGuid}");
+                var libHost64Name = $"{LibHostBaseName}.x64.exe";
+                var libHost64Path = Path.Combine(Helper.GetExecutingAssemblyDirectory(), libHost64Name);
+                _libHostProcess64 = Process.Start(libHost64Path, $"{(int)_hookType} {_messageReceiver.Port} {_processId} {libHostMutexGuid}");
             }
 
-            var stopwatch = Stopwatch.StartNew();
-            var exitCode = 0;
-            var exitCode64 = 0;
-            var hostRunning = false;
-            var host64Running = false;
-            using (var signal64 = new ManualResetEvent(false))
+            var errorFile = Path.Combine(Path.GetTempPath(), libHostMutexGuid);
+            await Task.Delay(InitializationTimeout1InMilliseconds).ConfigureAwait(false);
+            CheckLibHostsStatus(out bool hostRunning, out bool host64Running, out int exitCode, out int exitCode64);
+            if (hostRunning && host64Running)
             {
-                if (Environment.Is64BitOperatingSystem)
-                {
-                    Task.Run(() =>
-                    {
-                        if (!_libHostProcess64.WaitForExit(InitializationTimeoutInMilliseconds))
-                        {
-                            host64Running = true;
-                        }
-                        else
-                        {
-                            exitCode64 = _libHostProcess64.ExitCode;
-                        }
-                        signal64.Set();
-                    });
-                }
-                else
-                {
-                    signal64.Set();
-                }
-
-                if (!_libHostProcess.WaitForExit(InitializationTimeoutInMilliseconds))
-                {
-                    hostRunning = true;
-                }
-                else
-                {
-                    exitCode = _libHostProcess.ExitCode;
-                }
-
-                signal64.WaitOne();
-
-                if (exitCode != 0 || exitCode64 != 0)
-                {
-                }
-                else if (hostRunning && host64Running)
-                {
-                }
-
-                Debug.WriteLine($"exitCode: {exitCode}; exitCode64: {exitCode64}");
-                Debug.WriteLine($"hostRunning: {hostRunning}; host64Running: {host64Running}");
+                await Task.Delay(InitializationTimeout2InMilliseconds).ConfigureAwait(false);
+                CheckLibHostsStatus(out hostRunning, out host64Running, out exitCode, out exitCode64);
             }
 
-            Debug.WriteLine($"elapsed: {stopwatch.ElapsedMilliseconds}");
+            if (hostRunning && host64Running)
+            {
+                await Task.Delay(InitializationTimeout3InMilliseconds).ConfigureAwait(false);
+                CheckLibHostsStatus(out hostRunning, out host64Running, out exitCode, out exitCode64);
+            }
 
-            // TODO: add a hook confirmation by validating an init message sent from lib
+            if (hostRunning && host64Running)
+            {
+                throw new WinookException("The Winook library host applications have timed out.");
+            }
+
+            var errorFileExists = File.Exists(errorFile);
+            if (exitCode != 0 || exitCode64 != 0 || errorFileExists)
+            {
+                if (errorFileExists)
+                {
+                    throw new WinookException(File.ReadAllText(errorFile));
+                }
+                else if (!(exitCode != 0 && exitCode64 != 0))
+                {
+                    throw new WinookException("One of the Winook library host applications has failed.");
+                }
+                else
+                {
+                    throw new WinookException("The Winook library host applications have failed.");
+                }
+            }
         }
 
-        public virtual void Uninstall()
+        public void Uninstall()
         {
             ReleaseAndDisposeMutex();
             _messageReceiver.Stop();
@@ -155,9 +141,30 @@
 
         protected abstract void OnMessageReceived(object sender, MessageEventArgs e);
 
+        private void CheckLibHostsStatus(out bool hostRunning, out bool host64Running, out int exitCode, out int exitCode64)
+        {
+            exitCode = 0;
+            exitCode64 = 0;
+            host64Running = false;
+            if (Environment.Is64BitOperatingSystem)
+            {
+                host64Running = !_libHostProcess64.HasExited;
+                if (!host64Running)
+                {
+                    exitCode64 = _libHostProcess64.ExitCode;
+                }
+            }
+
+            hostRunning = !_libHostProcess.HasExited;
+            if (!hostRunning)
+            {
+                exitCode = _libHostProcess.ExitCode;
+            }
+        }
+
         private void ReleaseAndDisposeMutex()
         {
-            if (_libHostMutexReleaseEvent != null && !_libHostMutexReleaseEvent.SafeWaitHandle.IsClosed)
+            if (_libHostMutexReleaseEvent != null)
             {
                 _libHostMutexReleaseEvent.Set();
                 _libHostMutexReleaseEvent.Dispose();

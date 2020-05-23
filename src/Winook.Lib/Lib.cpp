@@ -7,7 +7,9 @@
 #include <regex>
 #include <string>
 
+#if !defined(__MINGW32__)
 #pragma comment (lib, "shlwapi.lib")
+#endif
 
 #define LOGWINOOKLIB 1
 #if _DEBUG && LOGWINOOKLIB
@@ -123,7 +125,7 @@ LRESULT CALLBACK MouseHookProc(int code, WPARAM wParam, LPARAM lParam)
 #endif
     if (code == HC_ACTION)
     {
-        HookMouseMessage hmm{};
+        HookMouseMessage hmm;
         hmm.messageCode = (DWORD)wParam;
         if (wParam == WM_MOUSEWHEEL)
         {

@@ -8,7 +8,9 @@
 
 #include <string>
 
+#if !defined(__MINGW32__)
 #pragma comment (lib, "shlwapi.lib")
+#endif
 
 #define LOGWINOOKLIBHOST 1
 #if _DEBUG && LOGWINOOKLIBHOST
