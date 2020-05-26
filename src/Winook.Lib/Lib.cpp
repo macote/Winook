@@ -125,7 +125,7 @@ LRESULT CALLBACK MouseHookProc(int code, WPARAM wParam, LPARAM lParam)
 #endif
     if (code == HC_ACTION)
     {
-        HookMouseMessage hmm;
+        HookMouseMessage hmm{};
         hmm.messageCode = (DWORD)wParam;
         if (wParam == WM_MOUSEWHEEL)
         {
