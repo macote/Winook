@@ -40,6 +40,8 @@
 
                 _mouseHook = new MouseHook(_process.Id);
                 _mouseHook.MessageReceived += MouseHook_MessageReceived;
+                _mouseHook.LeftButtonUp += MouseHook_LeftButtonUp;
+                _mouseHook.AddMouseHandler(MouseMessageCode.NCLeftButtonUp, MouseHook_NCLButtonUp);
                 mouseButton.Text = "Installing hook...";
                 await _mouseHook.InstallAsync();
                 _mouseHookInstalled = true;
@@ -52,11 +54,28 @@
                 mouseButton.Text = "Mouse Hook";
             }
         }
+
+        private void MouseHook_LeftButtonUp(object sender, MouseMessageEventArgs e)
+        {
+            testLabel.Invoke((MethodInvoker)delegate
+            {
+                testLabel.Text = $"Mouse Message Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}";
+            });
+        }
+
         private void MouseHook_MessageReceived(object sender, MouseMessageEventArgs e)
         {
             mouseLabel.Invoke((MethodInvoker)delegate
             {
                 mouseLabel.Text = $"Mouse Message Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}";
+            });
+        }
+
+        private void MouseHook_NCLButtonUp(object sender, MouseMessageEventArgs e)
+        {
+            testLabel.Invoke((MethodInvoker)delegate
+            {
+                testLabel.Text = $"Mouse Message Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}";
             });
         }
 

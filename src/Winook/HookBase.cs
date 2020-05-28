@@ -2,7 +2,9 @@
 {
     using System;
     using System.Diagnostics;
+    using System.Globalization;
     using System.IO;
+    using System.Resources;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -22,6 +24,8 @@
         private Process _libHostProcess64;
         private ManualResetEventSlim _libHostMutexReleaseEvent;
         private bool _disposed = false;
+
+        private ResourceManager _resourceManager = new ResourceManager(typeof(Winook.Properties.Resources));
 
         #endregion
 
@@ -90,7 +94,7 @@
 
             if (hostRunning && host64Running)
             {
-                throw new WinookException("The Winook library host applications have timed out.");
+                throw new WinookException(_resourceManager.GetString("HostApplicationsTimedOut", CultureInfo.CurrentCulture));
             }
 
             var errorFileExists = File.Exists(errorFile);
@@ -102,11 +106,11 @@
                 }
                 else if (!(exitCode != 0 && exitCode64 != 0))
                 {
-                    throw new WinookException("One of the Winook library host applications has failed.");
+                    throw new WinookException(_resourceManager.GetString("HostApplicationFailed", CultureInfo.CurrentCulture));
                 }
                 else
                 {
-                    throw new WinookException("The Winook library host applications have failed.");
+                    throw new WinookException(_resourceManager.GetString("HostApplicationsFailed", CultureInfo.CurrentCulture));
                 }
             }
         }

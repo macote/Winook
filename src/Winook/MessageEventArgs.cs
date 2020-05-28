@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace Winook
+﻿namespace Winook
 {
+    using System;
+
 #pragma warning disable CA1051 // Do not declare visible instance fields
     public class MessageEventArgs : EventArgs
     {
