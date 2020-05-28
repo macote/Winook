@@ -42,6 +42,7 @@
                 _mouseHook.MessageReceived += MouseHook_MessageReceived;
                 _mouseHook.LeftButtonUp += MouseHook_LeftButtonUp;
                 _mouseHook.AddMouseHandler(MouseMessageCode.NCLeftButtonUp, MouseHook_NCLButtonUp);
+                _mouseHook.RemoveMouseHandler(MouseMessageCode.NCLeftButtonUp, MouseHook_NCLButtonUp);
                 mouseButton.Text = "Installing hook...";
                 await _mouseHook.InstallAsync();
                 _mouseHookInstalled = true;

@@ -82,7 +82,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Winook\Winook.csproj">
+    <ProjectReference Include="..\..\src\Winook\Winook.csproj">
       <Project>{e5984e13-442b-4833-af21-a704b67a99ab}</Project>
       <Name>Winook</Name>
     </ProjectReference>

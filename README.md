@@ -42,3 +42,7 @@ Keyboard hooking works in a similar way.
 # License
 
 MIT
+
+# Acknowledgements
+
+Thanks to [C1rdec](https://github.com/C1rdec) for the inspiration and motivation. I created this initially to help him with his [project](https://github.com/C1rdec/Poe-Lurker).

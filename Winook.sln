@@ -12,7 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Winook.Desktop.Test", "src\Winook.Desktop.Test\Winook.Desktop.Test.csproj", "{BFE61D8C-E947-4F75-98E2-17A276F72175}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Winook.Desktop.Test", "test\Winook.Desktop.Test\Winook.Desktop.Test.csproj", "{BFE61D8C-E947-4F75-98E2-17A276F72175}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Winook.Lib", "src\Winook.Lib\Winook.Lib.vcxproj", "{5FB052A8-82FA-46E9-A9DF-078BF725A548}"
 EndProject
