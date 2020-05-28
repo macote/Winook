@@ -75,7 +75,7 @@
         {
             if (_mouseMessageHandlers.ContainsKey(mouseMessageCode))
             {
-                _mouseMessageHandlers[mouseMessageCode] -= handler;
+                _mouseMessageHandlers[mouseMessageCode] -= handler ?? throw new ArgumentNullException(nameof(handler));
             }
         }
 
@@ -150,7 +150,7 @@
 
             if (_mouseMessageHandlers.ContainsKey(eventArgs.MessageCode))
             {
-                _mouseMessageHandlers[eventArgs.MessageCode].Invoke(this, eventArgs);
+                _mouseMessageHandlers[eventArgs.MessageCode]?.Invoke(this, eventArgs);
             }
         }
 
