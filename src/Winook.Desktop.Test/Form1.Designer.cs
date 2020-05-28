@@ -37,12 +37,13 @@
             this.keyboardLabel = new System.Windows.Forms.Label();
             this.radio32bit = new System.Windows.Forms.RadioButton();
             this.radio64bit = new System.Windows.Forms.RadioButton();
+            this.testLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // mouseButton
             // 
             this.mouseButton.Location = new System.Drawing.Point(13, 13);
-            this.mouseButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.mouseButton.Margin = new System.Windows.Forms.Padding(4);
             this.mouseButton.Name = "mouseButton";
             this.mouseButton.Size = new System.Drawing.Size(330, 221);
             this.mouseButton.TabIndex = 0;
@@ -53,7 +54,7 @@
             // mouseLabel
             // 
             this.mouseLabel.AutoSize = true;
-            this.mouseLabel.Location = new System.Drawing.Point(20, 303);
+            this.mouseLabel.Location = new System.Drawing.Point(20, 310);
             this.mouseLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.mouseLabel.Name = "mouseLabel";
             this.mouseLabel.Size = new System.Drawing.Size(167, 25);
@@ -63,7 +64,7 @@
             // keyboardButton
             // 
             this.keyboardButton.Location = new System.Drawing.Point(352, 13);
-            this.keyboardButton.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.keyboardButton.Margin = new System.Windows.Forms.Padding(6);
             this.keyboardButton.Name = "keyboardButton";
             this.keyboardButton.Size = new System.Drawing.Size(330, 221);
             this.keyboardButton.TabIndex = 2;
@@ -74,7 +75,7 @@
             // keyboardLabel
             // 
             this.keyboardLabel.AutoSize = true;
-            this.keyboardLabel.Location = new System.Drawing.Point(22, 343);
+            this.keyboardLabel.Location = new System.Drawing.Point(20, 350);
             this.keyboardLabel.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.keyboardLabel.Name = "keyboardLabel";
             this.keyboardLabel.Size = new System.Drawing.Size(192, 25);
@@ -104,18 +105,28 @@
             this.radio64bit.Text = "64-bit";
             this.radio64bit.UseVisualStyleBackColor = true;
             // 
+            // testLabel
+            // 
+            this.testLabel.AutoSize = true;
+            this.testLabel.Location = new System.Drawing.Point(20, 390);
+            this.testLabel.Name = "testLabel";
+            this.testLabel.Size = new System.Drawing.Size(146, 25);
+            this.testLabel.TabIndex = 6;
+            this.testLabel.Text = "Test messages";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(693, 404);
+            this.ClientSize = new System.Drawing.Size(693, 454);
+            this.Controls.Add(this.testLabel);
             this.Controls.Add(this.radio64bit);
             this.Controls.Add(this.radio32bit);
             this.Controls.Add(this.keyboardLabel);
             this.Controls.Add(this.keyboardButton);
             this.Controls.Add(this.mouseLabel);
             this.Controls.Add(this.mouseButton);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form1";
             this.Text = "Form1";
             this.ResumeLayout(false);
@@ -131,6 +142,7 @@
         private System.Windows.Forms.Label keyboardLabel;
         private System.Windows.Forms.RadioButton radio32bit;
         private System.Windows.Forms.RadioButton radio64bit;
+        private System.Windows.Forms.Label testLabel;
     }
 }
 
