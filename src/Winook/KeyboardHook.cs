@@ -17,6 +17,8 @@
 
         public event EventHandler<KeyboardMessageEventArgs> MessageReceived;
 
+        public delegate void KeyboardEventHandler(object sender, KeyboardMessageEventArgs e);
+
         #endregion
 
         #region Constructors
@@ -36,11 +38,12 @@
 
             var eventArgs = new KeyboardMessageEventArgs
             {
-                VirtualKeyCode = BitConverter.ToInt32(e.Bytes, 0),
+                VirtualKeyCode = BitConverter.ToInt16(e.Bytes, 0),
+                ShiftControlAltFlags = BitConverter.ToUInt16(e.Bytes, 2),
                 Flags = BitConverter.ToUInt32(e.Bytes, 4),
             };
 
-            Debug.WriteLine($"Keyboard Virtual Key Code: {eventArgs.VirtualKeyCode}; Flags: {eventArgs.Flags:x}");
+            Debug.WriteLine($"Keyboard Virtual Key Code: {eventArgs.VirtualKeyCode}; ShiftControlAlt: {eventArgs.ShiftControlAltFlags:x}; Flags: {eventArgs.Flags:x}");
 
             MessageReceived?.Invoke(this, eventArgs);
         }

@@ -115,7 +115,7 @@
         {
             keyboardLabel.Invoke((MethodInvoker)delegate
             {
-                keyboardLabel.Text = $"Keyboard Virtual Key Code: {e.VirtualKeyCode}; Flags: {e.Flags:x}";
+                keyboardLabel.Text = $"Keyboard Virtual Key Code: {e.VirtualKeyCode}; ShiftControlAlt: {e.ShiftControlAltFlags}; Flags: {e.Flags:x}";
             });
         }
     }

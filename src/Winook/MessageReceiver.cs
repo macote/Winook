@@ -15,7 +15,7 @@
         private CancellationTokenSource _cancellationTokenSource;
         private CancellationToken _cancellationToken;
         private Task _listeningTask;
-        private ManualResetEvent _portSetEvent;
+        private ManualResetEventSlim _portSetEvent;
 
         private bool _disposed = false;
 
@@ -50,7 +50,7 @@
         {
             _cancellationTokenSource = new CancellationTokenSource();
             _cancellationToken = _cancellationTokenSource.Token;
-            _portSetEvent = new ManualResetEvent(false);
+            _portSetEvent = new ManualResetEventSlim(false);
             _listeningTask = Task.Run(() =>
             {
                 _tcpListener = new TcpListener(IPAddress.Loopback, 0);
@@ -71,10 +71,7 @@
                                 if (bytecount + offset == _messageByteSize)
                                 {
                                     offset = 0;
-                                    MessageReceived(this, new MessageEventArgs
-                                    {
-                                        Bytes = bytes
-                                    });
+                                    MessageReceived(this, new MessageEventArgs { Bytes = bytes });
                                 }
                                 else
                                 {
@@ -102,16 +99,13 @@
                 }
                 catch (SocketException exception)
                 {
-                    switch (exception.ErrorCode)
+                    if (exception.ErrorCode != 10004) // WSACancelBlockingCall
                     {
-                        case 10004: // WSACancelBlockingCall
-                            break;
-                        default:
-                            throw;
+                        throw;
                     }
                 }
             });
-            _portSetEvent.WaitOne();
+            _portSetEvent.Wait();
         }
 
         public void Stop()
