@@ -5,7 +5,7 @@
 #pragma warning disable CA1051 // Do not declare visible instance fields
     public class KeyboardMessageEventArgs : EventArgs
     {
-        public short VirtualKeyCode;
+        public ushort VirtualKeyCode;
         public ushort ShiftControlAltFlags;
         public uint Flags;
     }

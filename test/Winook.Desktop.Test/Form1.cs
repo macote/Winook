@@ -41,8 +41,8 @@
                 _mouseHook = new MouseHook(_process.Id);
                 _mouseHook.MessageReceived += MouseHook_MessageReceived;
                 _mouseHook.LeftButtonUp += MouseHook_LeftButtonUp;
-                _mouseHook.AddMouseHandler(MouseMessageCode.NCLeftButtonUp, MouseHook_NCLButtonUp);
-                _mouseHook.RemoveMouseHandler(MouseMessageCode.NCLeftButtonUp, MouseHook_NCLButtonUp);
+                _mouseHook.AddHandler(MouseMessageCode.NCLeftButtonUp, MouseHook_NCLButtonUp);
+                _mouseHook.RemoveHandler(MouseMessageCode.NCLeftButtonUp, MouseHook_NCLButtonUp);
                 mouseButton.Text = "Installing hook...";
                 await _mouseHook.InstallAsync();
                 _mouseHookInstalled = true;
@@ -98,6 +98,7 @@
 
                 _keyboardHook = new KeyboardHook(_process.Id);
                 _keyboardHook.MessageReceived += KeyboardHook_MessageReceived;
+                _keyboardHook.AddHandler(0x59, KeyboardHotKeyModifiers.None, KeyboardHook_Test);
                 keyboardButton.Text = "Installing hook...";
                 await _keyboardHook.InstallAsync();
                 _keyboardHookInstalled = true;
@@ -116,6 +117,14 @@
             keyboardLabel.Invoke((MethodInvoker)delegate
             {
                 keyboardLabel.Text = $"Keyboard Virtual Key Code: {e.VirtualKeyCode}; ShiftControlAlt: {e.ShiftControlAltFlags}; Flags: {e.Flags:x}";
+            });
+        }
+
+        private void KeyboardHook_Test(object sender, KeyboardMessageEventArgs e)
+        {
+            testLabel.Invoke((MethodInvoker)delegate
+            {
+                testLabel.Text = $"Keyboard Virtual Key Code: {e.VirtualKeyCode}; ShiftControlAlt: {e.ShiftControlAltFlags}; Flags: {e.Flags:x}";
             });
         }
     }
