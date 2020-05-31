@@ -33,7 +33,7 @@ _mouseHook.InstallAsync();
 
 _keyboardHook = new KeyboardHook(_process.Id);
 _keyboardHook.MessageReceived += KeyboardHook_MessageReceived;
-//_keyboardHook.AddHandler(0x59, HotKeyModifiers.ControlShift, KeyboardHook_ControlShiftY);
+//_keyboardHook.AddHandler('Y', HotKeyModifiers.ControlShift, KeyboardHook_ControlShiftY);
 _keyboardHook.InstallAsync();
 
 ...
