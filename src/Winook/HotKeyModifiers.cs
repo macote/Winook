@@ -3,7 +3,7 @@
     using System;
 
     [Flags]
-    public enum KeyboardHotKeyModifiers
+    public enum HotKeyModifiers
     {
         None = 0,
         Alt = 1,
@@ -15,8 +15,9 @@
         LeftAlt = 64,
         LeftControl = 128,
         LeftShift = 256,
-        ControlAlt = Control | Alt,
+        AltControl = Alt | Control,
+        AltShift = Alt | Shift,
         ControlShift = Control | Shift,
-        ShiftAlt = Shift | Alt,
+        ShiftControlAlt = Shift | Control | Alt,
     }
 }

@@ -35,25 +35,28 @@
 
         #region Methods
 
-        public void AddHandler(ushort virtualKeyCode, KeyboardHotKeyModifiers hotKey, KeyboardEventHandler handler)
+        public void AddHandler(ushort keyCode, KeyboardEventHandler handler)
+            => AddHandler(keyCode, HotKeyModifiers.None, handler);
+
+        public void AddHandler(ushort keyCode, HotKeyModifiers modifiers, KeyboardEventHandler handler)
         {
             if (handler == null)
             {
                 throw new ArgumentNullException(nameof(handler));
             }
 
-            if (hotKey == KeyboardHotKeyModifiers.None)
+            if (modifiers == HotKeyModifiers.None)
             {
-                if (!_messageHandlers.ContainsKey(virtualKeyCode))
+                if (!_messageHandlers.ContainsKey(keyCode))
                 {
-                    _messageHandlers.Add(virtualKeyCode, null);
+                    _messageHandlers.Add(keyCode, null);
                 }
 
-                _messageHandlers[virtualKeyCode] += handler;
+                _messageHandlers[keyCode] += handler;
             }
             else
             {
-                var handlerKeys = GetHandlerKeys(virtualKeyCode, hotKey);
+                var handlerKeys = GetHandlerKeys(keyCode, modifiers);
                 foreach (var key in handlerKeys)
                 {
                     if (!_messageHandlers.ContainsKey(key))
@@ -66,18 +69,21 @@
             }
         }
 
-        public void RemoveHandler(ushort virtualKeyCode, KeyboardHotKeyModifiers hotKey, KeyboardEventHandler handler)
+        public void RemoveHandler(ushort keyCode, KeyboardEventHandler handler)
+            => RemoveHandler(keyCode, HotKeyModifiers.None, handler);
+
+        public void RemoveHandler(ushort keyCode, HotKeyModifiers hotKey, KeyboardEventHandler handler)
         {
-            if (hotKey == KeyboardHotKeyModifiers.None)
+            if (hotKey == HotKeyModifiers.None)
             {
-                if (_messageHandlers.ContainsKey(virtualKeyCode))
+                if (_messageHandlers.ContainsKey(keyCode))
                 {
-                    _messageHandlers[virtualKeyCode] -= handler ?? throw new ArgumentNullException(nameof(handler));
+                    _messageHandlers[keyCode] -= handler ?? throw new ArgumentNullException(nameof(handler));
                 }
             }
             else
             {
-                var handlerKeys = GetHandlerKeys(virtualKeyCode, hotKey);
+                var handlerKeys = GetHandlerKeys(keyCode, hotKey);
                 foreach (var key in handlerKeys)
                 {
                     if (_messageHandlers.ContainsKey(key))
@@ -94,58 +100,47 @@
 
             var eventArgs = new KeyboardMessageEventArgs
             {
-                VirtualKeyCode = BitConverter.ToUInt16(e.Bytes, 0),
-                ShiftControlAltFlags = BitConverter.ToUInt16(e.Bytes, 2),
+                KeyCode = BitConverter.ToUInt16(e.Bytes, 0),
+                Modifiers = BitConverter.ToUInt16(e.Bytes, 2),
                 Flags = BitConverter.ToUInt32(e.Bytes, 4),
             };
 
-            Debug.WriteLine($"Keyboard Virtual Key Code: {eventArgs.VirtualKeyCode}; ShiftControlAlt: {eventArgs.ShiftControlAltFlags:x}; Flags: {eventArgs.Flags:x}");
+            Debug.WriteLine($"Keyboard Virtual Key Code: {eventArgs.KeyCode}; Modifiers: {eventArgs.Modifiers:x}; Flags: {eventArgs.Flags:x}");
 
             MessageReceived?.Invoke(this, eventArgs);
 
-            uint handlerKey = GetHandlerKey(eventArgs.VirtualKeyCode, eventArgs.ShiftControlAltFlags);
+            uint handlerKey = GetHandlerKey(eventArgs.KeyCode, eventArgs.Modifiers);
             if (_messageHandlers.ContainsKey(handlerKey))
             {
                 _messageHandlers[handlerKey]?.Invoke(this, eventArgs);
             }
         }
 
-        private static uint GetHandlerKey(ushort virtualKeyCode, KeyboardHotKeyModifiers hotKeyModifiers)
-            => GetHandlerKey(virtualKeyCode, (ushort)hotKeyModifiers);
+        private static uint GetHandlerKey(ushort keyCode, HotKeyModifiers modifiers)
+            => GetHandlerKey(keyCode, (ushort)modifiers);
 
-        private static uint GetHandlerKey(ushort virtualKeyCode, ushort hotKeyModValue, ushort applyMod = 0)
-            => virtualKeyCode | (((uint)hotKeyModValue & 0b111_111_000 | applyMod) << 16);
+        private static uint GetHandlerKey(ushort keyCode, ushort hotKeyModValue, ushort applyMod = 0)
+            => keyCode | (((uint)hotKeyModValue & 0b111_111_000 | applyMod) << 16);
 
-        private static IEnumerable<uint> GetHandlerKeys(ushort virtualKeyCode, KeyboardHotKeyModifiers hotKeyModifiers)
-            => GetHandlerKeys(virtualKeyCode, (ushort)hotKeyModifiers);
+        private static IEnumerable<uint> GetHandlerKeys(ushort keyCode, HotKeyModifiers modifiers)
+            => GetHandlerKeys(keyCode, (ushort)modifiers);
 
-        private static IEnumerable<uint> GetHandlerKeys(ushort virtualKeyCode, ushort hotKeyModValue)
+        private static IEnumerable<uint> GetHandlerKeys(ushort keyCode, ushort modValue)
         {
             var keys = new HashSet<uint>();
-            if ((hotKeyModValue & 0b100) > 0)
+            if ((modValue & 0b111) > 0)
             {
-                keys.Add(GetHandlerKey(virtualKeyCode, hotKeyModValue, 0b100_000_000));
-                keys.Add(GetHandlerKey(virtualKeyCode, hotKeyModValue, 0b000_100_000));
-                keys.Add(GetHandlerKey(virtualKeyCode, hotKeyModValue, 0b100_100_000));
+                var left = (ushort)((modValue & 0b111) << 6);
+                var right = (ushort)((modValue & 0b111) << 3);
+                var both = (ushort)(left | right);
+                keys.Add(GetHandlerKey(keyCode, modValue, left));
+                keys.Add(GetHandlerKey(keyCode, modValue, right));
+                keys.Add(GetHandlerKey(keyCode, modValue, both));
             }
 
-            if ((hotKeyModValue & 0b010) > 0)
+            if ((modValue & 0b111_111_000) > 0)
             {
-                keys.Add(GetHandlerKey(virtualKeyCode, hotKeyModValue, 0b010_000_000));
-                keys.Add(GetHandlerKey(virtualKeyCode, hotKeyModValue, 0b000_010_000));
-                keys.Add(GetHandlerKey(virtualKeyCode, hotKeyModValue, 0b010_010_000));
-            }
-
-            if ((hotKeyModValue & 0b001) > 0)
-            {
-                keys.Add(GetHandlerKey(virtualKeyCode, hotKeyModValue, 0b001_000_000));
-                keys.Add(GetHandlerKey(virtualKeyCode, hotKeyModValue, 0b000_001_000));
-                keys.Add(GetHandlerKey(virtualKeyCode, hotKeyModValue, 0b001_001_000));
-            }
-
-            if ((hotKeyModValue & 0b111_111_000) > 0)
-            {
-                keys.Add(GetHandlerKey(virtualKeyCode, hotKeyModValue));
+                keys.Add(GetHandlerKey(keyCode, modValue));
             }
 
             return keys;

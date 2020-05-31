@@ -52,7 +52,7 @@
     <Compile Include="HookType.cs" />
     <Compile Include="KeyboardHook.cs" />
     <Compile Include="HookBase.cs" />
-    <Compile Include="KeyboardHotKeyModifiers.cs" />
+    <Compile Include="HotKeyModifiers.cs" />
     <Compile Include="KeyboardMessageEventArg.cs" />
     <Compile Include="MessageEventArgs.cs" />
     <Compile Include="MessageReceiver.cs" />

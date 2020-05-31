@@ -98,7 +98,7 @@
 
                 _keyboardHook = new KeyboardHook(_process.Id);
                 _keyboardHook.MessageReceived += KeyboardHook_MessageReceived;
-                _keyboardHook.AddHandler(0x59, KeyboardHotKeyModifiers.None, KeyboardHook_Test);
+                _keyboardHook.AddHandler(0x59, HotKeyModifiers.Control | HotKeyModifiers.LeftShift, KeyboardHook_Test);
                 keyboardButton.Text = "Installing hook...";
                 await _keyboardHook.InstallAsync();
                 _keyboardHookInstalled = true;
@@ -116,7 +116,7 @@
         {
             keyboardLabel.Invoke((MethodInvoker)delegate
             {
-                keyboardLabel.Text = $"Keyboard Virtual Key Code: {e.VirtualKeyCode}; ShiftControlAlt: {e.ShiftControlAltFlags}; Flags: {e.Flags:x}";
+                keyboardLabel.Text = $"Keyboard Virtual Key Code: {e.KeyCode}; ShiftControlAlt: {e.Modifiers}; Flags: {e.Flags:x}";
             });
         }
 
@@ -124,7 +124,7 @@
         {
             testLabel.Invoke((MethodInvoker)delegate
             {
-                testLabel.Text = $"Keyboard Virtual Key Code: {e.VirtualKeyCode}; ShiftControlAlt: {e.ShiftControlAltFlags}; Flags: {e.Flags:x}";
+                testLabel.Text = $"Keyboard Virtual Key Code: {e.KeyCode}; ShiftControlAlt: {e.Modifiers}; Flags: {e.Flags:x}";
             });
         }
     }

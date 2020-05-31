@@ -27,7 +27,14 @@ _process = Process.Start(@"c:\windows\notepad.exe");
 
 _mouseHook = new MouseHook(_process.Id);
 _mouseHook.MessageReceived += MouseHook_MessageReceived;
+//_mouseHook.LeftButtonUp += MouseHook_LeftButtonUp;
+//_mouseHook.AddHandler(MouseMessageCode.NCLeftButtonUp, MouseHook_NCLButtonUp);
 _mouseHook.InstallAsync();
+
+_keyboardHook = new KeyboardHook(_process.Id);
+_keyboardHook.MessageReceived += KeyboardHook_MessageReceived;
+//_keyboardHook.AddHandler(0x59, HotKeyModifiers.ControlShift, KeyboardHook_ControlShiftY);
+_keyboardHook.InstallAsync();
 
 ...
 
@@ -35,9 +42,15 @@ private void MouseHook_MessageReceived(object sender, MouseMessageEventArgs e)
 {
     Debug.WriteLine($"Mouse Message Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}");
 }
-```
 
-Keyboard hooking works in a similar way.
+...
+
+private void KeyboardHook_MessageReceived(object sender, KeyboardMessageEventArgs e)
+{
+    Debug.WriteLine($"Keyboard Virtual Key Code: {e.KeyCode}; Modifiers: {e.Modifiers:x}; Flags: {e.Flags:x}");
+}
+
+```
 
 # License
 
