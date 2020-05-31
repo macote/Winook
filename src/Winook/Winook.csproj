@@ -54,6 +54,7 @@
     <Compile Include="HookBase.cs" />
     <Compile Include="HotKeyModifiers.cs" />
     <Compile Include="KeyboardMessageEventArg.cs" />
+    <Compile Include="KeyDirection.cs" />
     <Compile Include="MessageEventArgs.cs" />
     <Compile Include="MessageReceiver.cs" />
     <Compile Include="MouseHook.cs" />

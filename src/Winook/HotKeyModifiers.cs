@@ -17,7 +17,7 @@
         LeftShift = 256,
         AltControl = Alt | Control,
         AltShift = Alt | Shift,
+        AltControlShift = Alt | Control | Shift,
         ControlShift = Control | Shift,
-        ShiftControlAlt = Shift | Control | Alt,
     }
 }
