@@ -35,28 +35,40 @@
 
         #region Methods
 
-        public void AddHandler(ushort keyCode, KeyboardEventHandler handler)
-            => AddHandler(keyCode, KeyDirection.Up, HotKeyModifiers.None, handler);
+        public void AddHandler(KeyCode keyCode, KeyboardEventHandler handler)
+            => AddHandler((ushort)keyCode, KeyDirection.Up, Modifiers.None, handler);
 
-        public void AddHandler(ushort keyCode, HotKeyModifiers modifiers, KeyboardEventHandler handler)
-            => AddHandler(keyCode, KeyDirection.Up, modifiers, handler);
+        public void AddHandler(ushort keyValue, KeyboardEventHandler handler)
+            => AddHandler(keyValue, KeyDirection.Up, Modifiers.None, handler);
 
-        public void AddHandler(ushort keyCode, KeyDirection direction, HotKeyModifiers modifiers, KeyboardEventHandler handler)
+        public void AddHandler(KeyCode keyCode, Modifiers modifiers, KeyboardEventHandler handler)
+            => AddHandler((ushort)keyCode, KeyDirection.Up, modifiers, handler);
+        public void AddHandler(ushort keyValue, Modifiers modifiers, KeyboardEventHandler handler)
+            => AddHandler(keyValue, KeyDirection.Up, modifiers, handler);
+
+        public void AddHandler(KeyCode keyCode, KeyDirection direction, Modifiers modifiers, KeyboardEventHandler handler)
+            => AddHandler((ushort)keyCode, direction, modifiers, handler);
+
+        public void AddHandler(ushort keyValue, KeyDirection direction, Modifiers modifiers, KeyboardEventHandler handler)
         {
-            var handlerKeys = GetHandlerKeys(keyCode, modifiers, direction);
-            foreach (var key in handlerKeys)
+            foreach (var key in GetHandlerKeys(keyValue, modifiers, direction))
             {
                 AddHandlerInternal(key, handler ?? throw new ArgumentNullException(nameof(handler)));
             }
         }
 
-        public void RemoveHandler(ushort keyCode, KeyboardEventHandler handler)
-            => RemoveHandler(keyCode, HotKeyModifiers.None, KeyDirection.Up, handler);
+        public void RemoveHandler(KeyCode keyCode, KeyboardEventHandler handler)
+            => RemoveHandler((ushort)keyCode, Modifiers.None, KeyDirection.Up, handler);
 
-        public void RemoveHandler(ushort keyCode, HotKeyModifiers modifiers, KeyDirection direction, KeyboardEventHandler handler)
+        public void RemoveHandler(ushort keyValue, KeyboardEventHandler handler)
+            => RemoveHandler(keyValue, Modifiers.None, KeyDirection.Up, handler);
+
+        public void RemoveHandler(KeyCode keyCode, Modifiers modifiers, KeyDirection direction, KeyboardEventHandler handler)
+            => RemoveHandler((ushort)keyCode, modifiers, direction, handler);
+
+        public void RemoveHandler(ushort keyValue, Modifiers modifiers, KeyDirection direction, KeyboardEventHandler handler)
         {
-            var handlerKeys = GetHandlerKeys(keyCode, modifiers, direction);
-            foreach (var key in handlerKeys)
+            foreach (var key in GetHandlerKeys(keyValue, modifiers, direction))
             {
                 RemoveHandlerInternal(key, handler ?? throw new ArgumentNullException(nameof(handler)));
             }
@@ -66,18 +78,27 @@
         {
             Contract.Requires(e != null);
 
+            var keyValue = BitConverter.ToUInt16(e.Bytes, 0);
+            var modifiers = BitConverter.ToUInt16(e.Bytes, 2);
+            var flags = BitConverter.ToUInt32(e.Bytes, 4);
+            var pressed = (flags & 0x80000000) == 0;
             var eventArgs = new KeyboardMessageEventArgs
             {
-                KeyCode = BitConverter.ToUInt16(e.Bytes, 0),
-                Modifiers = BitConverter.ToUInt16(e.Bytes, 2),
-                Flags = BitConverter.ToUInt32(e.Bytes, 4),
+                KeyValue = keyValue,
+                Modifiers = modifiers,
+                Flags = flags,
+                Shift = (modifiers & 0b100) > 0,
+                Control = (modifiers & 0b10) > 0,
+                Alt = (modifiers & 0b1) > 0,
+                Direction = pressed ? KeyDirection.Down : KeyDirection.Up,
             };
 
-            Debug.WriteLine($"Keyboard Virtual Key Code: {eventArgs.KeyCode}; Modifiers: {eventArgs.Modifiers:x}; Flags: {eventArgs.Flags:x}");
+            Debug.Write($"Code: {eventArgs.KeyValue}; Modifiers: {eventArgs.Modifiers:x}; Flags: {eventArgs.Flags:x}; ");
+            Debug.WriteLine($"Shift: {eventArgs.Shift}; Control: {eventArgs.Control}; Alt: {eventArgs.Alt}; Direction: {eventArgs.Direction}");
 
             MessageReceived?.Invoke(this, eventArgs);
 
-            uint handlerKey = GetHandlerKey(eventArgs.KeyCode, eventArgs.Modifiers, (eventArgs.Flags & 0x80000000) == 0);
+            uint handlerKey = GetHandlerKey(keyValue, modifiers, pressed);
             if (_messageHandlers.ContainsKey(handlerKey))
             {
                 _messageHandlers[handlerKey]?.Invoke(this, eventArgs);
@@ -110,68 +131,54 @@
         /// [24..22]: left shift, control and alt (1 = pressed)
         /// [21..19]: right shift, control and alt (1 = pressed)
         /// [18..16]: shift, control and alt (left or right, 1 = pressed)
-        /// [15..0]: virtual key code
-        /// Modifiers that are not side sensitive are applied through the extended modifiers parameter.
+        /// [15..0]: virtual key code value
+        /// Modifiers that are not side sensitive are optionally applied.
         /// </summary>
-        /// <param name="keyCode"></param>
+        /// <param name="keyValue"></param>
         /// <param name="modifiers"></param>
         /// <param name="pressed"></param>
-        /// <param name="extendedModifiers"></param>
+        /// <param name="insensitiveModifiers"></param>
         /// <returns></returns>
-        private static uint GetHandlerKey(ushort keyCode, ushort modifiers, bool pressed, ushort extendedModifiers = 0)
-            => keyCode | (((uint)modifiers & 0b111_111_000 | extendedModifiers | (pressed ? (uint)1 : 0) << 9) << 16);
+        private static uint GetHandlerKey(ushort keyValue, ushort modifiers, bool pressed, ushort insensitiveModifiers = 0)
+            => keyValue | (((uint)modifiers & 0b111_111_000 | insensitiveModifiers | (pressed ? (uint)1 : 0) << 9) << 16);
 
-        private static IEnumerable<uint> GetHandlerKeys(ushort keyCode, HotKeyModifiers modifiers, KeyDirection direction)
-            => GetHandlerKeys(keyCode, (ushort)modifiers, direction);
+        private static IEnumerable<uint> GetHandlerKeys(ushort keyValue, Modifiers modifiers, KeyDirection direction)
+            => GetHandlerKeys(keyValue, (ushort)modifiers, direction);
 
-        private static IEnumerable<uint> GetHandlerKeys(ushort keyCode, ushort modifiers, KeyDirection direction)
+        private static IEnumerable<uint> GetHandlerKeys(ushort keyValue, ushort modifiers, KeyDirection direction)
         {
             var keys = new HashSet<uint>();
             if ((modifiers & 0b111) > 0)
             {
+                // Add handlers for side insensitive modifiers
                 var left = (ushort)((modifiers & 0b111) << 6);
                 var right = (ushort)((modifiers & 0b111) << 3);
                 var both = (ushort)(left | right);
                 if (direction == KeyDirection.Any | direction == KeyDirection.Up)
                 {
-                    keys.Add(GetHandlerKey(keyCode, modifiers, false, left));
+                    keys.Add(GetHandlerKey(keyValue, modifiers, false, left));
+                    keys.Add(GetHandlerKey(keyValue, modifiers, false, right));
+                    keys.Add(GetHandlerKey(keyValue, modifiers, false, both));
                 }
 
                 if (direction == KeyDirection.Any | direction == KeyDirection.Down)
                 {
-                    keys.Add(GetHandlerKey(keyCode, modifiers, true, left));
-                }
-
-                if (direction == KeyDirection.Any | direction == KeyDirection.Up)
-                {
-                    keys.Add(GetHandlerKey(keyCode, modifiers, false, right));
-                }
-
-                if (direction == KeyDirection.Any | direction == KeyDirection.Down)
-                {
-                    keys.Add(GetHandlerKey(keyCode, modifiers, true, right));
-                }
-
-                if (direction == KeyDirection.Any | direction == KeyDirection.Up)
-                {
-                    keys.Add(GetHandlerKey(keyCode, modifiers, false, both));
-                }
-
-                if (direction == KeyDirection.Any | direction == KeyDirection.Down)
-                {
-                    keys.Add(GetHandlerKey(keyCode, modifiers, true, both));
+                    keys.Add(GetHandlerKey(keyValue, modifiers, true, left));
+                    keys.Add(GetHandlerKey(keyValue, modifiers, true, right));
+                    keys.Add(GetHandlerKey(keyValue, modifiers, true, both));
                 }
             }
-            else if ((modifiers & 0b111_111_000) > 0)
+            else if ((modifiers & 0b111_111_000) > 0 || modifiers == 0)
             {
+                // Add handlers for side sensitive modifiers and unmodified (single) keys
                 if (direction == KeyDirection.Any | direction == KeyDirection.Up)
                 {
-                    keys.Add(GetHandlerKey(keyCode, modifiers, false));
+                    keys.Add(GetHandlerKey(keyValue, modifiers, false));
                 }
 
                 if (direction == KeyDirection.Any | direction == KeyDirection.Down)
                 {
-                    keys.Add(GetHandlerKey(keyCode, modifiers, true));
+                    keys.Add(GetHandlerKey(keyValue, modifiers, true));
                 }
             }
 

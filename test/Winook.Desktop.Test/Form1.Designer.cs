@@ -118,7 +118,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(693, 454);
+            this.ClientSize = new System.Drawing.Size(980, 454);
             this.Controls.Add(this.testLabel);
             this.Controls.Add(this.radio64bit);
             this.Controls.Add(this.radio32bit);

@@ -3,7 +3,7 @@
     using System;
 
     [Flags]
-    public enum HotKeyModifiers
+    public enum Modifiers
     {
         None = 0,
         Alt = 1,

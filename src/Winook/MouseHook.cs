@@ -93,7 +93,7 @@
                 Delta = BitConverter.ToInt16(e.Bytes, 20),
             };
 
-            Debug.WriteLine($"Mouse Message Code: {eventArgs.MessageCode}; X: {eventArgs.X}; Y: {eventArgs.Y}; Delta: {eventArgs.Delta}");
+            Debug.WriteLine($"Code: {eventArgs.MessageCode}; X: {eventArgs.X}; Y: {eventArgs.Y}; Delta: {eventArgs.Delta}");
 
             MessageReceived?.Invoke(this, eventArgs);
 

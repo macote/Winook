@@ -40,6 +40,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -52,8 +53,9 @@
     <Compile Include="HookType.cs" />
     <Compile Include="KeyboardHook.cs" />
     <Compile Include="HookBase.cs" />
-    <Compile Include="HotKeyModifiers.cs" />
+    <Compile Include="Modifiers.cs" />
     <Compile Include="KeyboardMessageEventArg.cs" />
+    <Compile Include="KeyCode.cs" />
     <Compile Include="KeyDirection.cs" />
     <Compile Include="MessageEventArgs.cs" />
     <Compile Include="MessageReceiver.cs" />
