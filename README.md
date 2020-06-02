@@ -33,21 +33,20 @@ _mouseHook.InstallAsync();
 
 _keyboardHook = new KeyboardHook(_process.Id);
 _keyboardHook.MessageReceived += KeyboardHook_MessageReceived;
-//_keyboardHook.AddHandler('Y', HotKeyModifiers.ControlShift, KeyboardHook_ControlShiftY);
+//_keyboardHook.AddHandler(KeyCode.Y, Modifiers.ControlShift, KeyboardHook_ControlShiftY);
 _keyboardHook.InstallAsync();
 
 ...
 
 private void MouseHook_MessageReceived(object sender, MouseMessageEventArgs e)
 {
-    Debug.WriteLine($"Mouse Message Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}");
+    Debug.WriteLine($"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}");
 }
-
-...
 
 private void KeyboardHook_MessageReceived(object sender, KeyboardMessageEventArgs e)
 {
-    Debug.WriteLine($"Keyboard Virtual Key Code: {e.KeyCode}; Modifiers: {e.Modifiers:x}; Flags: {e.Flags:x}");
+    Debug.Write($"Code: {e.KeyValue}; Modifiers: {e.Modifiers:x}; Flags: {e.Flags:x}; ");
+    Debug.WriteLine($"Shift: {e.Shift}; Control: {e.Control}; Alt: {e.Alt}; Direction: {e.Direction}");
 }
 
 ```
