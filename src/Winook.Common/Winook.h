@@ -350,7 +350,7 @@ inline void Winook::CleanUp()
     DWORD exitCode{};
     if (process_ != NULL)
     {
-        if (GetExitCodeProcess(process_, &exitCode))
+        if (!GetExitCodeProcess(process_, &exitCode))
         {
             HandleError("GetExitCodeProcess() failed", GetLastError());
         }
