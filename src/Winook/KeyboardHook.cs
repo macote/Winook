@@ -13,6 +13,7 @@
         private const HookType KeyboardHookType = HookType.Keyboard; // WH_KEYBOARD
 
         private Dictionary<uint, KeyboardEventHandler> _messageHandlers = new Dictionary<uint, KeyboardEventHandler>();
+        private bool _disposed = false;
 
         #endregion
 
@@ -103,6 +104,27 @@
             {
                 _messageHandlers[handlerKey]?.Invoke(this, eventArgs);
             }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+                MessageReceived = null;
+                foreach (var key in _messageHandlers.Keys)
+                {
+                    _messageHandlers[key] = null;
+                }
+            }
+
+            _disposed = true;
+
+            base.Dispose(disposing);
         }
 
         private void AddHandlerInternal(uint key, KeyboardEventHandler handler)

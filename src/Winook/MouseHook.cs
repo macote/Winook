@@ -13,6 +13,7 @@
         private const HookType MouseHookType = HookType.Mouse; // WH_MOUSE
 
         private Dictionary<int, MouseEventHandler> _messageHandlers = new Dictionary<int, MouseEventHandler>();
+        private bool _disposed = false;
 
         #endregion
 
@@ -152,6 +153,42 @@
             {
                 _messageHandlers[eventArgs.MessageCode]?.Invoke(this, eventArgs);
             }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+                MessageReceived = null;
+                MouseMove = null;
+                LeftButtonDown = null;
+                LeftButtonUp = null;
+                LeftButtonDblClk = null;
+                RightButtonDown = null;
+                RightButtonUp = null;
+                RightButtonDblClk = null;
+                MiddleButtonDown = null;
+                MiddleButtonUp = null;
+                MiddleButtonDblClk = null;
+                MouseWheel = null;
+                XButtonDown = null;
+                XButtonUp = null;
+                XButtonDblClk = null;
+                MouseHWheel = null;
+                foreach (var key in _messageHandlers.Keys)
+                {
+                    _messageHandlers[key] = null;
+                }
+            }
+
+            _disposed = true;
+
+            base.Dispose(disposing);
         }
 
         private MouseMessageCode? GetMessageCode(int messageCode)

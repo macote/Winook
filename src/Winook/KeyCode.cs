@@ -428,7 +428,9 @@
         //
         // Summary:
         //     The decimal key.
+#pragma warning disable CA1720 // Identifier contains type name
         Decimal = 110,
+#pragma warning restore CA1720 // Identifier contains type name
         //
         // Summary:
         //     The divide key.
