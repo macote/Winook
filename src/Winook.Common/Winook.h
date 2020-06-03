@@ -26,6 +26,12 @@ const std::wstring kMouseHookLibName = std::wstring(TEXT("Winook.Lib.Mouse.x86.d
 const std::string kKeyboardHookProcName = std::string("KeyboardHookProc");
 const std::string kMouseHookProcName = std::string("MouseHookProc");
 
+#define LOGWINOOK 1
+#if _DEBUG && LOGWINOOK
+#define LOGWINOOKPATH L"C:\\Temp\\Winook_"
+#include "DebugHelper.h"
+#endif
+
 class Winook
 {
 public:
@@ -34,6 +40,9 @@ public:
 public:
     Winook(INT hooktype, INT processid, std::wstring port, std::wstring mutexguid)
         : hooktype_(hooktype), processid_(processid), port_(port), mutexguid_(mutexguid)
+#if _DEBUG && LOGWINOOK
+        , logger_(TimestampLogger(LOGWINOOKPATH + TimestampLogger::GetTimestampString(TRUE) + L".log", TRUE))
+#endif
     {
     }
     virtual ~Winook()
@@ -48,7 +57,6 @@ private:
     void WaitForProcess();
     void FindProcessMainWindowThreadId();
     void GetLibPath();
-    void LoadLib();
     void WriteConfigurationFile();
     void SetupHook();
     void WaitOnHostMutex();
@@ -66,8 +74,10 @@ private:
     DWORD threadid_{};
     std::wstring hooklibpath_;
     HHOOK hook_{ NULL };
-    HMODULE hooklib_{ NULL };
     HANDLE mutex_{ NULL };
+#if _DEBUG && LOGWINOOK
+    TimestampLogger logger_;
+#endif
 };
 
 inline std::wstring Winook::GetConfigFilePath(LPCTSTR libfullpath, DWORD processid, DWORD threadid, INT hooktype)
@@ -173,7 +183,6 @@ inline void Winook::Hook()
     WaitForProcess();
     FindProcessMainWindowThreadId();
     GetLibPath();
-    LoadLib();
     WriteConfigurationFile();
     SetupHook();
     WaitOnHostMutex();
@@ -250,15 +259,6 @@ inline void Winook::GetLibPath()
     hooklibpath_ = libpath;
 }
 
-inline void Winook::LoadLib()
-{
-    hooklib_ = LoadLibrary(hooklibpath_.c_str());
-    if (hooklib_ == NULL)
-    {
-        HandleError("LoadLibrary() failed", GetLastError());
-    }    
-}
-
 inline void Winook::WriteConfigurationFile()
 {
     const auto configfilepath = Winook::GetConfigFilePath(processfullpath_.c_str(), processid_, threadid_, hooktype_);
@@ -283,16 +283,28 @@ inline void Winook::SetupHook()
         HandleError("Unsupported hook type");
     }
 
-    const auto hookproc = (HOOKPROC)GetProcAddress(hooklib_, hookprocname.c_str());
+    const auto hooklib = LoadLibrary(hooklibpath_.c_str());
+    if (hooklib == NULL)
+    {
+        HandleError("LoadLibrary() failed", GetLastError());
+    }
+
+
+    const auto hookproc = (HOOKPROC)GetProcAddress(hooklib, hookprocname.c_str());
     if (hookproc == NULL)
     {
         HandleError("GetProcAddress() failed", GetLastError());
     }
 
-    hook_ = SetWindowsHookEx(hooktype_, hookproc, hooklib_, threadid_);
+    hook_ = SetWindowsHookEx(hooktype_, hookproc, hooklib, threadid_);
     if (hook_ == NULL)
     {
         HandleError("SetWindowsHookEx() failed", GetLastError());
+    }
+
+    if (!FreeLibrary(hooklib))
+    {
+        HandleError("FreeLibrary() failed", GetLastError());
     }
 }
 
@@ -335,8 +347,14 @@ inline void Winook::HandleError(std::string errormessage, DWORD errorcode)
 
 inline void Winook::CleanUp()
 {
+    DWORD exitCode{};
     if (process_ != NULL)
     {
+        if (GetExitCodeProcess(process_, &exitCode))
+        {
+            HandleError("GetExitCodeProcess() failed", GetLastError());
+        }
+
         CloseHandle(process_);
     }
 
@@ -345,19 +363,11 @@ inline void Winook::CleanUp()
         CloseHandle(mutex_);
     }
 
-    if (hook_ != NULL)
+    if (hook_ != NULL && exitCode == STILL_ACTIVE)
     {
         if (!UnhookWindowsHookEx(hook_))
         {
             HandleError("UnhookWindowsHookEx() failed", GetLastError());
-        }
-    }
-
-    if (hooklib_ != NULL)
-    {
-        if (!FreeLibrary(hooklib_))
-        {
-            HandleError("FreeLibrary() failed", GetLastError());
         }
     }
 }
