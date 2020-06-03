@@ -12,7 +12,8 @@
         private const int HookMessageSizeInBytes = 24;
         private const HookType MouseHookType = HookType.Mouse; // WH_MOUSE
 
-        private Dictionary<int, MouseEventHandler> _mouseMessageHandlers = new Dictionary<int, MouseEventHandler>();
+        private Dictionary<int, MouseEventHandler> _messageHandlers = new Dictionary<int, MouseEventHandler>();
+        private bool _disposed = false;
 
         #endregion
 
@@ -50,32 +51,32 @@
 
         #region Methods
 
-        public void AddMouseHandler(MouseMessageCode mouseMessageCode, MouseEventHandler handler)
-            => AddMouseHandler((int)mouseMessageCode, handler);
+        public void AddHandler(MouseMessageCode mouseMessageCode, MouseEventHandler handler)
+            => AddHandler((int)mouseMessageCode, handler);
 
-        public void AddMouseHandler(int mouseMessageCode, MouseEventHandler handler)
+        public void AddHandler(int mouseMessageCode, MouseEventHandler handler)
         {
             if (handler == null)
             {
                 throw new ArgumentNullException(nameof(handler));
             }
 
-            if (!_mouseMessageHandlers.ContainsKey(mouseMessageCode))
+            if (!_messageHandlers.ContainsKey(mouseMessageCode))
             {
-                _mouseMessageHandlers.Add(mouseMessageCode, null);
+                _messageHandlers.Add(mouseMessageCode, null);
             }
 
-            _mouseMessageHandlers[mouseMessageCode] += handler;
+            _messageHandlers[mouseMessageCode] += handler;
         }
 
-        public void RemoveMouseHandler(MouseMessageCode mouseMessageCode, MouseEventHandler handler)
-            => RemoveMouseHandler((int)mouseMessageCode, handler);
+        public void RemoveHandler(MouseMessageCode mouseMessageCode, MouseEventHandler handler)
+            => RemoveHandler((int)mouseMessageCode, handler);
 
-        public void RemoveMouseHandler(int mouseMessageCode, MouseEventHandler handler)
+        public void RemoveHandler(int mouseMessageCode, MouseEventHandler handler)
         {
-            if (_mouseMessageHandlers.ContainsKey(mouseMessageCode))
+            if (_messageHandlers.ContainsKey(mouseMessageCode))
             {
-                _mouseMessageHandlers[mouseMessageCode] -= handler ?? throw new ArgumentNullException(nameof(handler));
+                _messageHandlers[mouseMessageCode] -= handler ?? throw new ArgumentNullException(nameof(handler));
             }
         }
 
@@ -93,7 +94,7 @@
                 Delta = BitConverter.ToInt16(e.Bytes, 20),
             };
 
-            Debug.WriteLine($"Mouse Message Code: {eventArgs.MessageCode}; X: {eventArgs.X}; Y: {eventArgs.Y}; Delta: {eventArgs.Delta}");
+            Debug.WriteLine($"Code: {eventArgs.MessageCode}; X: {eventArgs.X}; Y: {eventArgs.Y}; Delta: {eventArgs.Delta}");
 
             MessageReceived?.Invoke(this, eventArgs);
 
@@ -148,10 +149,46 @@
                     break;
             }
 
-            if (_mouseMessageHandlers.ContainsKey(eventArgs.MessageCode))
+            if (_messageHandlers.ContainsKey(eventArgs.MessageCode))
             {
-                _mouseMessageHandlers[eventArgs.MessageCode]?.Invoke(this, eventArgs);
+                _messageHandlers[eventArgs.MessageCode]?.Invoke(this, eventArgs);
             }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+                MessageReceived = null;
+                MouseMove = null;
+                LeftButtonDown = null;
+                LeftButtonUp = null;
+                LeftButtonDblClk = null;
+                RightButtonDown = null;
+                RightButtonUp = null;
+                RightButtonDblClk = null;
+                MiddleButtonDown = null;
+                MiddleButtonUp = null;
+                MiddleButtonDblClk = null;
+                MouseWheel = null;
+                XButtonDown = null;
+                XButtonUp = null;
+                XButtonDblClk = null;
+                MouseHWheel = null;
+                foreach (var key in _messageHandlers.Keys)
+                {
+                    _messageHandlers[key] = null;
+                }
+            }
+
+            _disposed = true;
+
+            base.Dispose(disposing);
         }
 
         private MouseMessageCode? GetMessageCode(int messageCode)

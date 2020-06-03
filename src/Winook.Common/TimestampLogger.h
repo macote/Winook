@@ -32,6 +32,7 @@ public:
 
         Close();
     }
+    void WriteLine(const std::string& line);
     void WriteLine(const std::wstring& line);
     void Close()
     {
@@ -45,6 +46,12 @@ private:
     StreamLineWriter streamlinewriter_;
     PCRITICAL_SECTION pwritecriticalsection_{ nullptr };
 };
+
+inline void TimestampLogger::WriteLine(const std::string& line)
+{
+    std::wstring wline(line.begin(), line.end());
+    WriteLine(wline);
+}
 
 inline void TimestampLogger::WriteLine(const std::wstring& line)
 {

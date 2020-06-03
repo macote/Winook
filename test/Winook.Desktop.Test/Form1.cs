@@ -41,8 +41,8 @@
                 _mouseHook = new MouseHook(_process.Id);
                 _mouseHook.MessageReceived += MouseHook_MessageReceived;
                 _mouseHook.LeftButtonUp += MouseHook_LeftButtonUp;
-                _mouseHook.AddMouseHandler(MouseMessageCode.NCLeftButtonUp, MouseHook_NCLButtonUp);
-                _mouseHook.RemoveMouseHandler(MouseMessageCode.NCLeftButtonUp, MouseHook_NCLButtonUp);
+                _mouseHook.AddHandler(MouseMessageCode.NCLeftButtonUp, MouseHook_NCLButtonUp);
+                _mouseHook.RemoveHandler(MouseMessageCode.NCLeftButtonUp, MouseHook_NCLButtonUp);
                 mouseButton.Text = "Installing hook...";
                 await _mouseHook.InstallAsync();
                 _mouseHookInstalled = true;
@@ -60,7 +60,7 @@
         {
             testLabel.Invoke((MethodInvoker)delegate
             {
-                testLabel.Text = $"Mouse Message Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}";
+                testLabel.Text = $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}";
             });
         }
 
@@ -68,7 +68,7 @@
         {
             mouseLabel.Invoke((MethodInvoker)delegate
             {
-                mouseLabel.Text = $"Mouse Message Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}";
+                mouseLabel.Text = $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}";
             });
         }
 
@@ -76,7 +76,7 @@
         {
             testLabel.Invoke((MethodInvoker)delegate
             {
-                testLabel.Text = $"Mouse Message Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}";
+                testLabel.Text = $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}";
             });
         }
 
@@ -98,6 +98,8 @@
 
                 _keyboardHook = new KeyboardHook(_process.Id);
                 _keyboardHook.MessageReceived += KeyboardHook_MessageReceived;
+                //_keyboardHook.AddHandler(KeyCode.Y, KeyboardHook_Test);
+                _keyboardHook.AddHandler(KeyCode.Y, Modifiers.ControlShift, KeyboardHook_Test);
                 keyboardButton.Text = "Installing hook...";
                 await _keyboardHook.InstallAsync();
                 _keyboardHookInstalled = true;
@@ -115,7 +117,19 @@
         {
             keyboardLabel.Invoke((MethodInvoker)delegate
             {
-                keyboardLabel.Text = $"Keyboard Virtual Key Code: {e.VirtualKeyCode}; Flags: {e.Flags:x}";
+                keyboardLabel.Text = $"Code: {e.KeyValue}; Modifiers: {e.Modifiers}; Flags: {e.Flags:x} "
+                    + $"Shift: {e.Shift}; Control: {e.Control}; Alt: {e.Alt}; Direction: {e.Direction}";
+            });
+        }
+
+        private void KeyboardHook_Test(object sender, KeyboardMessageEventArgs e)
+        {
+            Debug.Write($"KeyboardHook_Test - Code: {e.KeyValue}; Modifiers: {e.Modifiers:x}; Flags: {e.Flags:x}; ");
+            Debug.WriteLine($"Shift: {e.Shift}; Control: {e.Control}; Alt: {e.Alt}; Direction: {e.Direction}");
+            testLabel.Invoke((MethodInvoker)delegate
+            {
+                testLabel.Text = $"Code: {e.KeyValue}; Modifiers: {e.Modifiers}; Flags: {e.Flags:x} "
+                    + $"Shift: {e.Shift}; Control: {e.Control}; Alt: {e.Alt}; Direction: {e.Direction}";
             });
         }
     }
