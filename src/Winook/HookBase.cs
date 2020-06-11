@@ -25,7 +25,7 @@
         private ManualResetEventSlim _libHostMutexReleaseEvent;
         private bool _disposed = false;
 
-        private ResourceManager _resourceManager = new ResourceManager(typeof(Winook.Properties.Resources));
+        private ResourceManager _resourceManager = new ResourceManager(typeof(Properties.Resources));
 
         #endregion
 

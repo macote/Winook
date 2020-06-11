@@ -190,7 +190,7 @@
                     keys.Add(GetHandlerKey(keyValue, modifiers, true, both));
                 }
             }
-            else if ((modifiers & 0b111_111_000) > 0 || modifiers == 0)
+            else
             {
                 // Add handlers for side sensitive modifiers and unmodified (single) keys
                 if (direction == KeyDirection.Any | direction == KeyDirection.Up)
