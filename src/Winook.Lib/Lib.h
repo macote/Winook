@@ -41,8 +41,8 @@ struct HookMouseMessage
 
 struct HookKeyboardMessage
 {
-    WORD virtualKeyCode;
-    WORD shiftCtrlAltState;
+    WORD keyCode;
+    WORD modifiers;
     DWORD flags;
 };
 

@@ -1,9 +1,11 @@
 #pragma once
 
-#include "TimestampLogger.h"
+#include <Windows.h>
 
-#include <string>
+#include <iomanip>
 #include <map>
+#include <string>
+#include <sstream>
 
 class DebugHelper
 {
