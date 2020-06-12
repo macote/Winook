@@ -1,14 +1,13 @@
 #include "Lib.h"
 #include "Winook.h"
 #include "MessageSender.h"
-#include "StreamLineReader.h"
 
-#include <cinttypes>
-#include <regex>
-#include <string>
 #if _DEBUG
 #include <bitset>
 #endif
+#include <fstream>
+#include <string>
+#include <regex>
 
 #if !defined(__MINGW32__)
 #pragma comment (lib, "shlwapi.lib")
@@ -18,6 +17,7 @@
 #if _DEBUG && LOGWINOOKLIB
 #define LOGWINOOKLIBPATH TEXT("C:\\Temp\\WinookLibHookProc_")
 #include "DebugHelper.h"
+#include "TimestampLogger.h"
 TimestampLogger Logger = TimestampLogger(LOGWINOOKLIBPATH + TimestampLogger::GetTimestampString(TRUE) + TEXT(".log"), TRUE);
 #endif
 
@@ -120,11 +120,12 @@ BOOL Initialize(HINSTANCE hinst)
         return TRUE; // Assume out-of-context initialization
     }
 
-    StreamLineReader configfile(configfilepath);
-    const auto port = std::stoi(configfile.ReadLine());
-    configfile.Close();
+    std::ifstream configfile(configfilepath.c_str());
+    std::string port;
+    configfile >> port;
+    configfile.close();
     DeleteFile(configfilepath.c_str());
-    messagesender.Connect(std::to_string(port));
+    messagesender.Connect(port);
 
     return TRUE;
 }
@@ -181,8 +182,8 @@ LRESULT CALLBACK KeyboardHookProc(int code, WPARAM wParam, LPARAM lParam)
         }
 
         HookKeyboardMessage hkm;
-        hkm.virtualKeyCode = (WORD)wParam;
-        hkm.shiftCtrlAltState = shiftctrlalt;
+        hkm.keyCode = (WORD)wParam;
+        hkm.modifiers = shiftctrlalt;
         hkm.flags = (DWORD)lParam;
         messagesender.SendMessage(&hkm, sizeof(HookKeyboardMessage));
     }

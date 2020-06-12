@@ -16,6 +16,7 @@
 #if _DEBUG && LOGWINOOKLIBHOST
 #define LOGWINOOKLIBHOSTPATH TEXT("C:\\Temp\\WinookLibHost_")
 #include "DebugHelper.h"
+#include "TimestampLogger.h"
 TimestampLogger Logger(LOGWINOOKLIBHOSTPATH + TimestampLogger::GetTimestampString(TRUE) + TEXT(".log"), TRUE);
 #endif
 

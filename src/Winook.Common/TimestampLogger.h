@@ -1,9 +1,10 @@
 #pragma once
 
-#include "StreamLineWriter.h"
-
 #include <Windows.h>
 
+#include <iomanip>
+#include <fstream>
+#include <sstream>
 #include <string>
 
 class TimestampLogger
@@ -12,15 +13,13 @@ public:
     TimestampLogger(const std::wstring& filepath)
         : TimestampLogger(filepath, FALSE) { }
     TimestampLogger(const std::wstring& filepath, BOOL autoflush)
-        : streamlinewriter_(StreamLineWriter(filepath, TRUE))
+        : logfile_(std::wofstream(filepath.c_str()))
     {
         pwritecriticalsection_ = new CRITICAL_SECTION();
         if (!InitializeCriticalSectionAndSpinCount(pwritecriticalsection_, 0x00000400))
         {
             // TODO: handle error
         }
-
-        set_autoflush(autoflush);
     }
     ~TimestampLogger()
     {
@@ -36,14 +35,12 @@ public:
     void WriteLine(const std::wstring& line);
     void Close()
     {
-        streamlinewriter_.Close();
+        logfile_.close();
     }
-    BOOL autoflush() const { return streamlinewriter_.autoflush(); };
-    void set_autoflush(BOOL autoflush) { streamlinewriter_.set_autoflush(autoflush); };
     static std::wstring GetTimestampString();
     static std::wstring GetTimestampString(BOOL asvalidfilename);
 private:
-    StreamLineWriter streamlinewriter_;
+    std::wofstream logfile_;
     PCRITICAL_SECTION pwritecriticalsection_{ nullptr };
 };
 
@@ -61,7 +58,7 @@ inline void TimestampLogger::WriteLine(const std::wstring& line)
     GetLocalTime(&filetime);
     std::wstringstream wss;
     wss << TEXT("[") << GetTimestampString() << TEXT("] ");
-    streamlinewriter_.WriteLine(wss.str() + line);
+    logfile_ << wss.str() << line;
 
     LeaveCriticalSection(pwritecriticalsection_);
 }

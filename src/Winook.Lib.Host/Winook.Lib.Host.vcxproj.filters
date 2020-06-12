@@ -21,15 +21,6 @@
     <ClInclude Include="..\Winook.Common\DebugHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Winook.Common\FileStream.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Winook.Common\StreamLineReader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Winook.Common\StreamLineWriter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\Winook.Common\TimestampLogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -41,9 +32,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Winook.Common\FileStream.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Host.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -62,5 +50,8 @@
     <ResourceCompile Include="Winook.Lib.Host.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Makefile" />
   </ItemGroup>
 </Project>

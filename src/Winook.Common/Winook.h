@@ -1,10 +1,11 @@
 #pragma once
 
 #include "MainWindowFinder.h"
-#include "StreamLineWriter.h"
 
 #include <Windows.h>
 
+#include <fstream>
+#include <sstream>
 #include <string>
 #include <regex>
 
@@ -30,6 +31,7 @@ const std::string kMouseHookProcName = std::string("MouseHookProc");
 #if _DEBUG && LOGWINOOK
 #define LOGWINOOKPATH L"C:\\Temp\\Winook_"
 #include "DebugHelper.h"
+#include "TimestampLogger.h"
 #endif
 
 class Winook
@@ -118,9 +120,8 @@ inline void Winook::LogError(std::string errormessage)
     TCHAR errorfilepath[kPathBufferSize];
     swprintf(errorfilepath, sizeof(errorfilepath), TEXT("%ls%ls"), temppath, mutexguid_.c_str());
 
-    StreamLineWriter errorfile(errorfilepath, false);
-    errorfile.WriteLine(errormessage);
-    errorfile.Close();
+    std::ofstream errorfile(errorfilepath);
+    errorfile << errormessage;
 }
 
 inline BOOL Winook::IsBitnessMatch()
@@ -262,9 +263,8 @@ inline void Winook::GetLibPath()
 inline void Winook::WriteConfigurationFile()
 {
     const auto configfilepath = Winook::GetConfigFilePath(processfullpath_.c_str(), processid_, threadid_, hooktype_);
-    StreamLineWriter configfile(configfilepath, false);
-    configfile.WriteLine(port_);
-    configfile.Close();
+    std::wofstream configfile(configfilepath.c_str());
+    configfile << port_ << std::endl;
 }
 
 inline void Winook::SetupHook()
