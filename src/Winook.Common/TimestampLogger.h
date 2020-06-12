@@ -2,9 +2,7 @@
 
 #include <Windows.h>
 
-//#include <codecvt>
 #include <iomanip>
-//#include <filesystem>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -15,10 +13,8 @@ public:
     TimestampLogger(const std::wstring& filepath)
         : TimestampLogger(filepath, FALSE) { }
     TimestampLogger(const std::wstring& filepath, BOOL autoflush)
-        //: logfile_(std::wofstream(std::filesystem::path(filepath)))
         : logfile_(std::wofstream(filepath.c_str()))
     {
-        //logfile_.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
         pwritecriticalsection_ = new CRITICAL_SECTION();
         if (!InitializeCriticalSectionAndSpinCount(pwritecriticalsection_, 0x00000400))
         {

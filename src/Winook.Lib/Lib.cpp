@@ -5,8 +5,6 @@
 #if _DEBUG
 #include <bitset>
 #endif
-#include <cinttypes>
-//#include <filesystem>
 #include <fstream>
 #include <string>
 #include <regex>
@@ -18,8 +16,8 @@
 #define LOGWINOOKLIB 1
 #if _DEBUG && LOGWINOOKLIB
 #define LOGWINOOKLIBPATH TEXT("C:\\Temp\\WinookLibHookProc_")
-#include "TimestampLogger.h"
 #include "DebugHelper.h"
+#include "TimestampLogger.h"
 TimestampLogger Logger = TimestampLogger(LOGWINOOKLIBPATH + TimestampLogger::GetTimestampString(TRUE) + TEXT(".log"), TRUE);
 #endif
 
@@ -123,7 +121,6 @@ BOOL Initialize(HINSTANCE hinst)
     }
 
     std::ifstream configfile(configfilepath.c_str());
-    //std::ifstream configfile(std::filesystem::path(configfilepath));
     std::string port;
     configfile >> port;
     configfile.close();

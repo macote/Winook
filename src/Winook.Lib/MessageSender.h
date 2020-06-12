@@ -7,8 +7,8 @@
 #define LOGWINOOKMESSAGESENDER 1
 #if _DEBUG && LOGWINOOKMESSAGESENDER
 #define LOGWINOOKMESSAGESENDERPATH TEXT("C:\\Temp\\WinookMessageSender_")
-#include "TimestampLogger.h"
 #include "DebugHelper.h"
+#include "TimestampLogger.h"
 TimestampLogger MessageSenderLogger = TimestampLogger(LOGWINOOKMESSAGESENDERPATH + TimestampLogger::GetTimestampString(TRUE) + TEXT(".log"), TRUE);
 #endif
 

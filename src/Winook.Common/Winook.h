@@ -4,11 +4,8 @@
 
 #include <Windows.h>
 
-//#include <codecvt>
-//#include <fstream>
-//#include <iostream>
-//#include <filesystem>
-//#include <sstream>
+#include <fstream>
+#include <sstream>
 #include <string>
 #include <regex>
 
@@ -33,8 +30,8 @@ const std::string kMouseHookProcName = std::string("MouseHookProc");
 #define LOGWINOOK 1
 #if _DEBUG && LOGWINOOK
 #define LOGWINOOKPATH L"C:\\Temp\\Winook_"
-#include "TimestampLogger.h"
 #include "DebugHelper.h"
+#include "TimestampLogger.h"
 #endif
 
 class Winook
@@ -267,9 +264,6 @@ inline void Winook::WriteConfigurationFile()
 {
     const auto configfilepath = Winook::GetConfigFilePath(processfullpath_.c_str(), processid_, threadid_, hooktype_);
     std::wofstream configfile(configfilepath.c_str());
-    //std::wofstream configfile(std::filesystem::path(configfilepath));
-
-    //configfile.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
     configfile << port_ << std::endl;
 }
 
