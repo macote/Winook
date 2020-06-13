@@ -8,7 +8,7 @@ WARNS = -Wall
 ifeq ($(DUMPMACHINE),x86_64-w64-mingw32) 
 	DLL = Winook.Lib.Keyboard.x64.dll bin/Winook.Lib.Mouse.x64.dll
 else
-	DLL = Winook.Lib.Keyboard.x86.dll bin/Winook.Lib.Mouse.x64.dll
+	DLL = Winook.Lib.Keyboard.x86.dll bin/Winook.Lib.Mouse.x86.dll
 endif
 
 WINDRES = windres

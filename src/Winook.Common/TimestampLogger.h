@@ -58,7 +58,7 @@ inline void TimestampLogger::WriteLine(const std::wstring& line)
     GetLocalTime(&filetime);
     std::wstringstream wss;
     wss << TEXT("[") << GetTimestampString() << TEXT("] ");
-    logfile_ << wss.str() << line;
+    logfile_ << wss.str() << line << std::endl;
 
     LeaveCriticalSection(pwritecriticalsection_);
 }
