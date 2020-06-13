@@ -12,7 +12,7 @@
 #pragma comment (lib, "shlwapi.lib")
 #endif
 
-#define LOGWINOOKLIBHOST 1
+#define LOGWINOOKLIBHOST 0
 #if _DEBUG && LOGWINOOKLIBHOST
 #define LOGWINOOKLIBHOSTPATH TEXT("C:\\Temp\\WinookLibHost_")
 #include "DebugHelper.h"
@@ -27,7 +27,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         INT argscount;
         const auto args = CommandLineToArgvW(GetCommandLine(), &argscount);
 
-        if (argscount != 5)
+        if (argscount < 5)
         {
             return EXIT_FAILURE;
         }
@@ -38,6 +38,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         const auto mutexguid = std::wstring(args[4]);
 
         Winook winook(hooktype, processid, port, mutexguid);
+
+        if (argscount > 5)
+        {
+            for (INT i = 5; i < argscount; i++)
+            {
+                winook.AddConfigArgument(args[i]);
+            }
+        }
 
         LocalFree(args);
 

@@ -12,7 +12,6 @@
         NCClick = 8,
         NCMove = 16,
         NCOther = 32,
-        IgnoreMove = Click | Other,
-        NCIgnoreMove = NCClick | NCOther
+        IgnoreMove = Click | Other | NCClick | NCOther,
     }
 }

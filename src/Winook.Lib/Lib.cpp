@@ -24,6 +24,7 @@ TimestampLogger Logger = TimestampLogger(LOGWINOOKLIBPATH + TimestampLogger::Get
 asio::io_context io_context;
 MessageSender messagesender(io_context);
 WORD shiftctrlalt{};
+WORD mousemessagetypes;
 
 BOOL WINAPI DllMain(HINSTANCE hinst, DWORD fdwReason, LPVOID lpReserved)
 {
@@ -123,6 +124,11 @@ BOOL Initialize(HINSTANCE hinst)
     std::ifstream configfile(configfilepath.c_str());
     std::string port;
     configfile >> port;
+    if (hooktype == WH_MOUSE)
+    {
+        configfile >> mousemessagetypes;
+    }
+
     configfile.close();
     DeleteFile(configfilepath.c_str());
     messagesender.Connect(port);
@@ -198,27 +204,69 @@ LRESULT CALLBACK MouseHookProc(int code, WPARAM wParam, LPARAM lParam)
 #endif
     if (code == HC_ACTION)
     {
-        HookMouseMessage hmm{};
-        hmm.messageCode = (DWORD)wParam;
-        if (wParam == WM_MOUSEWHEEL)
+        DWORD messagecode = (DWORD)wParam;
+        WORD messagetype = (messagecode == WM_NCHITTEST
+                || messagecode == WM_NCMOUSEHOVER
+                || messagecode == WM_NCMOUSELEAVE) << 5
+            | (messagecode == WM_NCMOUSEMOVE) << 4
+            | (messagecode == WM_NCLBUTTONDOWN
+                || messagecode == WM_NCLBUTTONUP
+                || messagecode == WM_NCLBUTTONDBLCLK
+                || messagecode == WM_NCRBUTTONDOWN
+                || messagecode == WM_NCRBUTTONUP
+                || messagecode == WM_NCRBUTTONDBLCLK
+                || messagecode == WM_NCMBUTTONDOWN
+                || messagecode == WM_NCMBUTTONUP
+                || messagecode == WM_NCMBUTTONDBLCLK) << 3
+            | (messagecode == WM_MOUSEACTIVATE
+                || messagecode == WM_MOUSEWHEEL
+                || messagecode == WM_MOUSEHWHEEL
+                || messagecode == WM_CAPTURECHANGED
+                || messagecode == WM_MOUSEHOVER
+                || messagecode == WM_MOUSELEAVE) << 2
+            | (messagecode == WM_MOUSEMOVE) << 1
+            | (messagecode == WM_LBUTTONDOWN
+                || messagecode == WM_LBUTTONUP
+                || messagecode == WM_LBUTTONDBLCLK
+                || messagecode == WM_RBUTTONDOWN
+                || messagecode == WM_RBUTTONUP
+                || messagecode == WM_RBUTTONDBLCLK
+                || messagecode == WM_MBUTTONDOWN
+                || messagecode == WM_MBUTTONUP
+                || messagecode == WM_MBUTTONDBLCLK
+                || messagecode == WM_XBUTTONDOWN
+                || messagecode == WM_XBUTTONUP
+                || messagecode == WM_XBUTTONDBLCLK);
+#if _DEBUG
+        std::bitset<16> mousemessagetypesbits(mousemessagetypes);
+        std::bitset<16> messagetypebits(messagetype);
+        LogDll(std::string("mousemessagetypesbits: ") + mousemessagetypesbits.to_string());
+        LogDll(std::string("messagetypebits: ") + messagetypebits.to_string());
+#endif
+        if (mousemessagetypes == 0 || (mousemessagetypes & messagetype) > 0)
         {
-            auto pmhsx = (PMOUSEHOOKSTRUCTEX)lParam;
-            hmm.pointX = pmhsx->pt.x;
-            hmm.pointY = pmhsx->pt.y;
-            hmm.hwnd = (DWORD)PtrToInt(pmhsx->hwnd);
-            hmm.hitTestCode = (DWORD)pmhsx->wHitTestCode;
-            hmm.zDelta = HIWORD(pmhsx->mouseData);
-        }
-        else
-        {
-            auto pmhs = (PMOUSEHOOKSTRUCT)lParam;
-            hmm.pointX = pmhs->pt.x;
-            hmm.pointY = pmhs->pt.y;
-            hmm.hwnd = (DWORD)PtrToInt(pmhs->hwnd);
-            hmm.hitTestCode = (DWORD)pmhs->wHitTestCode;
-        }
+            HookMouseMessage hmm{};
+            hmm.messageCode = messagecode;
+            if (wParam == WM_MOUSEWHEEL)
+            {
+                auto pmhsx = (PMOUSEHOOKSTRUCTEX)lParam;
+                hmm.pointX = pmhsx->pt.x;
+                hmm.pointY = pmhsx->pt.y;
+                hmm.hwnd = (DWORD)PtrToInt(pmhsx->hwnd);
+                hmm.hitTestCode = (DWORD)pmhsx->wHitTestCode;
+                hmm.zDelta = HIWORD(pmhsx->mouseData);
+            }
+            else
+            {
+                auto pmhs = (PMOUSEHOOKSTRUCT)lParam;
+                hmm.pointX = pmhs->pt.x;
+                hmm.pointY = pmhs->pt.y;
+                hmm.hwnd = (DWORD)PtrToInt(pmhs->hwnd);
+                hmm.hitTestCode = (DWORD)pmhs->wHitTestCode;
+            }
 
-        messagesender.SendMessage(&hmm, sizeof(HookMouseMessage));
+            messagesender.SendMessage(&hmm, sizeof(HookMouseMessage));
+        }
     }
 
     return CallNextHookEx(NULL, code, wParam, lParam);

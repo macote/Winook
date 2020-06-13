@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Diagnostics.Contracts;
+    using System.Globalization;
 
     public class MouseHook : HookBase
     {
@@ -43,8 +44,14 @@
         #region Constructors
 
         public MouseHook(int processId)
+            : this(processId, MouseMessageTypes.All)
+        {
+        }
+
+        public MouseHook(int processId, MouseMessageTypes messageTypes)
             : base(processId, MouseHookType, HookMessageSizeInBytes)
         {
+            AddHostArguments(((int)messageTypes).ToString(CultureInfo.InvariantCulture));
         }
 
         #endregion
