@@ -54,6 +54,7 @@ public:
 public:
     BOOL IsBitnessMatch();
     void Hook();
+    void AddConfigArgument(std::wstring argument);
 private:
     void GetProcessFullPath();
     void WaitForProcess();
@@ -67,6 +68,7 @@ private:
     void HandleError(std::string errormessage, DWORD errorcode);
     void CleanUp();
 private:
+    std::vector<std::wstring> additionalconfigargs_;
     INT hooktype_;
     INT processid_;
     std::wstring port_;
@@ -189,6 +191,11 @@ inline void Winook::Hook()
     WaitOnHostMutex();
 }
 
+inline void Winook::AddConfigArgument(std::wstring argument)
+{
+    additionalconfigargs_.push_back(argument);
+}
+
 inline void Winook::GetProcessFullPath()
 {
     TCHAR processfullpath[kPathBufferSize];
@@ -265,6 +272,10 @@ inline void Winook::WriteConfigurationFile()
     const auto configfilepath = Winook::GetConfigFilePath(processfullpath_.c_str(), processid_, threadid_, hooktype_);
     std::wofstream configfile(configfilepath.c_str());
     configfile << port_ << std::endl;
+    for (size_t i = 0; i < additionalconfigargs_.size(); i++)
+    {
+        configfile << additionalconfigargs_[i] << std::endl;
+    }
 }
 
 inline void Winook::SetupHook()

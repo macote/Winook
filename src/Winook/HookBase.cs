@@ -1,9 +1,11 @@
 ﻿namespace Winook
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
     using System.IO;
+    using System.Linq;
     using System.Resources;
     using System.Threading;
     using System.Threading.Tasks;
@@ -20,9 +22,11 @@
         private readonly int _processId;
         private readonly MessageReceiver _messageReceiver;
         private readonly HookType _hookType;
+        private readonly Guid _libHostMutexGuid = Guid.NewGuid();
         private Process _libHostProcess;
         private Process _libHostProcess64;
         private ManualResetEventSlim _libHostMutexReleaseEvent;
+        private List<string> _additionalHostArguments = new List<string>();
         private bool _disposed = false;
 
         private ResourceManager _resourceManager = new ResourceManager(typeof(Properties.Resources));
@@ -47,8 +51,7 @@
         {
             _messageReceiver.StartListening();
 
-            var libHostMutexGuid = Guid.NewGuid().ToString();
-            var libHostMutexName = $"Global\\{libHostMutexGuid}";
+            var libHostMutexName = $"Global\\{_libHostMutexGuid}";
             using (var acquireEvent = new ManualResetEventSlim(false))
             {
                 _libHostMutexReleaseEvent = new ManualResetEventSlim(false);
@@ -66,18 +69,17 @@
 
             var libHostName = $"{LibHostBaseName}.x86.exe";
             var libHostPath = Path.Combine(Helper.GetExecutingAssemblyDirectory(), libHostName);
-            _libHostProcess = Process.Start(libHostPath, $"{(int)_hookType} {_messageReceiver.Port} {_processId} {libHostMutexGuid}");
+            _libHostProcess = Process.Start(libHostPath, $"{GetHostArguments()}");
 
-            Debug.WriteLine($"{libHostName} args: {(int)_hookType} {_messageReceiver.Port} {_processId} {libHostMutexGuid}");
+            Debug.WriteLine($"{libHostName} args: {GetHostArguments()}");
 
             if (Environment.Is64BitOperatingSystem)
             {
                 var libHost64Name = $"{LibHostBaseName}.x64.exe";
                 var libHost64Path = Path.Combine(Helper.GetExecutingAssemblyDirectory(), libHost64Name);
-                _libHostProcess64 = Process.Start(libHost64Path, $"{(int)_hookType} {_messageReceiver.Port} {_processId} {libHostMutexGuid}");
+                _libHostProcess64 = Process.Start(libHost64Path, $"{GetHostArguments()}");
             }
 
-            var errorFile = Path.Combine(Path.GetTempPath(), libHostMutexGuid);
             await Task.Delay(InitializationTimeout1InMilliseconds).ConfigureAwait(false);
             CheckLibHostsStatus(out bool hostRunning, out bool host64Running, out int exitCode, out int exitCode64);
             if (hostRunning && host64Running)
@@ -97,6 +99,7 @@
                 throw new WinookException(_resourceManager.GetString("HostApplicationsTimedOut", CultureInfo.CurrentCulture));
             }
 
+            var errorFile = Path.Combine(Path.GetTempPath(), _libHostMutexGuid.ToString());
             var errorFileExists = File.Exists(errorFile);
             if (exitCode != 0 || exitCode64 != 0 || errorFileExists)
             {
@@ -144,6 +147,15 @@
         }
 
         protected abstract void OnMessageReceived(object sender, MessageEventArgs e);
+
+        protected void AddHostArguments(params string[] arguments)
+            =>_additionalHostArguments.AddRange(arguments);
+
+        private string GetBaseHostArguments()
+            => $"{(int)_hookType} {_messageReceiver.Port} {_processId} {_libHostMutexGuid}";
+
+        private string GetHostArguments()
+            => GetBaseHostArguments() + " " + string.Concat(_additionalHostArguments.ToList());
 
         private void CheckLibHostsStatus(out bool hostRunning, out bool host64Running, out int exitCode, out int exitCode64)
         {
