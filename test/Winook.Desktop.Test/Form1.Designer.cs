@@ -38,14 +38,15 @@
             this.radio32bit = new System.Windows.Forms.RadioButton();
             this.radio64bit = new System.Windows.Forms.RadioButton();
             this.testLabel = new System.Windows.Forms.Label();
+            this.ignoreMove = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // mouseButton
             // 
             this.mouseButton.Location = new System.Drawing.Point(13, 13);
-            this.mouseButton.Margin = new System.Windows.Forms.Padding(4);
+            this.mouseButton.Margin = new System.Windows.Forms.Padding(6);
             this.mouseButton.Name = "mouseButton";
-            this.mouseButton.Size = new System.Drawing.Size(330, 221);
+            this.mouseButton.Size = new System.Drawing.Size(330, 48);
             this.mouseButton.TabIndex = 0;
             this.mouseButton.Text = "Mouse Hook";
             this.mouseButton.UseVisualStyleBackColor = true;
@@ -54,7 +55,7 @@
             // mouseLabel
             // 
             this.mouseLabel.AutoSize = true;
-            this.mouseLabel.Location = new System.Drawing.Point(20, 310);
+            this.mouseLabel.Location = new System.Drawing.Point(8, 240);
             this.mouseLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.mouseLabel.Name = "mouseLabel";
             this.mouseLabel.Size = new System.Drawing.Size(167, 25);
@@ -63,10 +64,10 @@
             // 
             // keyboardButton
             // 
-            this.keyboardButton.Location = new System.Drawing.Point(352, 13);
+            this.keyboardButton.Location = new System.Drawing.Point(13, 111);
             this.keyboardButton.Margin = new System.Windows.Forms.Padding(6);
             this.keyboardButton.Name = "keyboardButton";
-            this.keyboardButton.Size = new System.Drawing.Size(330, 221);
+            this.keyboardButton.Size = new System.Drawing.Size(330, 48);
             this.keyboardButton.TabIndex = 2;
             this.keyboardButton.Text = "Keyboard Hook";
             this.keyboardButton.UseVisualStyleBackColor = true;
@@ -75,7 +76,7 @@
             // keyboardLabel
             // 
             this.keyboardLabel.AutoSize = true;
-            this.keyboardLabel.Location = new System.Drawing.Point(20, 350);
+            this.keyboardLabel.Location = new System.Drawing.Point(8, 280);
             this.keyboardLabel.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.keyboardLabel.Name = "keyboardLabel";
             this.keyboardLabel.Size = new System.Drawing.Size(192, 25);
@@ -86,7 +87,7 @@
             // 
             this.radio32bit.AutoSize = true;
             this.radio32bit.Checked = true;
-            this.radio32bit.Location = new System.Drawing.Point(13, 242);
+            this.radio32bit.Location = new System.Drawing.Point(13, 174);
             this.radio32bit.Name = "radio32bit";
             this.radio32bit.Size = new System.Drawing.Size(86, 29);
             this.radio32bit.TabIndex = 4;
@@ -97,7 +98,7 @@
             // radio64bit
             // 
             this.radio64bit.AutoSize = true;
-            this.radio64bit.Location = new System.Drawing.Point(167, 242);
+            this.radio64bit.Location = new System.Drawing.Point(167, 174);
             this.radio64bit.Name = "radio64bit";
             this.radio64bit.Size = new System.Drawing.Size(86, 29);
             this.radio64bit.TabIndex = 5;
@@ -108,17 +109,28 @@
             // testLabel
             // 
             this.testLabel.AutoSize = true;
-            this.testLabel.Location = new System.Drawing.Point(20, 390);
+            this.testLabel.Location = new System.Drawing.Point(8, 320);
             this.testLabel.Name = "testLabel";
             this.testLabel.Size = new System.Drawing.Size(146, 25);
             this.testLabel.TabIndex = 6;
             this.testLabel.Text = "Test messages";
             // 
+            // ignoreMove
+            // 
+            this.ignoreMove.AutoSize = true;
+            this.ignoreMove.Location = new System.Drawing.Point(13, 71);
+            this.ignoreMove.Name = "ignoreMove";
+            this.ignoreMove.Size = new System.Drawing.Size(241, 29);
+            this.ignoreMove.TabIndex = 7;
+            this.ignoreMove.Text = "Ignore move messages";
+            this.ignoreMove.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(980, 454);
+            this.ClientSize = new System.Drawing.Size(980, 408);
+            this.Controls.Add(this.ignoreMove);
             this.Controls.Add(this.testLabel);
             this.Controls.Add(this.radio64bit);
             this.Controls.Add(this.radio32bit);
@@ -143,6 +155,7 @@
         private System.Windows.Forms.RadioButton radio32bit;
         private System.Windows.Forms.RadioButton radio64bit;
         private System.Windows.Forms.Label testLabel;
+        private System.Windows.Forms.CheckBox ignoreMove;
     }
 }
 

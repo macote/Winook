@@ -38,7 +38,15 @@
                     }
                 }
 
-                _mouseHook = new MouseHook(_process.Id);
+                if (ignoreMove.Checked)
+                {
+                    _mouseHook = new MouseHook(_process.Id, MouseMessageTypes.IgnoreMove);
+                }
+                else
+                {
+                    _mouseHook = new MouseHook(_process.Id);
+                }
+
                 _mouseHook.MessageReceived += MouseHook_MessageReceived;
                 _mouseHook.LeftButtonUp += MouseHook_LeftButtonUp;
                 _mouseHook.AddHandler(MouseMessageCode.NCLeftButtonUp, MouseHook_NCLButtonUp);
@@ -100,6 +108,9 @@
                 _keyboardHook.MessageReceived += KeyboardHook_MessageReceived;
                 //_keyboardHook.AddHandler(KeyCode.Y, KeyboardHook_Test);
                 _keyboardHook.AddHandler(KeyCode.Y, Modifiers.ControlShift, KeyboardHook_Test);
+                _keyboardHook.AddHandler(KeyCode.U, Modifiers.Shift | Modifiers.RightControl, KeyboardHook_Test);
+                _keyboardHook.AddHandler(KeyCode.N, Modifiers.AltControlShift, KeyboardHook_Test);
+                _keyboardHook.AddHandler(KeyCode.T, KeyboardHook_Test);
                 keyboardButton.Text = "Installing hook...";
                 await _keyboardHook.InstallAsync();
                 _keyboardHookInstalled = true;
