@@ -25,6 +25,9 @@ Winook uses host processes and dll injection to setup hooks. Both 32-bit and 64-
 - Other Uses
   - Please share how you use Winook!
 
+## Limitation
+- This library doesn't work with UWP (Windows Store) apps like Windows 10's Calculator.
+
 # Installation
 
 ## NuGet
