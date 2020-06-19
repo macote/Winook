@@ -124,21 +124,27 @@
   <ItemGroup>
     <Content Include="..\Winook.Core\winook.support\Winook.Lib.Host.x64.exe">
       <Link>winook.support\Winook.Lib.Host.x64.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Winook.Core\winook.support\Winook.Lib.Host.x86.exe">
       <Link>winook.support\Winook.Lib.Host.x86.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Winook.Core\winook.support\Winook.Lib.Keyboard.x64.dll">
       <Link>winook.support\Winook.Lib.Keyboard.x64.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Winook.Core\winook.support\Winook.Lib.Keyboard.x86.dll">
       <Link>winook.support\Winook.Lib.Keyboard.x86.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Winook.Core\winook.support\Winook.Lib.Mouse.x64.dll">
       <Link>winook.support\Winook.Lib.Mouse.x64.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Winook.Core\winook.support\Winook.Lib.Mouse.x86.dll">
       <Link>winook.support\Winook.Lib.Mouse.x86.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
