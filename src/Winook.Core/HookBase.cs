@@ -29,7 +29,9 @@
         private List<string> _additionalHostArguments = new List<string>();
         private bool _disposed = false;
 
+#if !NETSTANDARD
         private ResourceManager _resourceManager = new ResourceManager(typeof(Properties.Resources));
+#endif
 
         #endregion
 
@@ -96,7 +98,11 @@
 
             if (hostRunning && host64Running)
             {
+#if !NETSTANDARD
                 throw new WinookException(_resourceManager.GetString("HostApplicationsTimedOut", CultureInfo.CurrentCulture));
+#else
+                throw new WinookException("The Winook library host applications have timed out.");
+#endif
             }
 
             var errorFile = Path.Combine(Path.GetTempPath(), _libHostMutexGuid.ToString());
@@ -109,11 +115,19 @@
                 }
                 else if (!(exitCode != 0 && exitCode64 != 0))
                 {
+#if !NETSTANDARD
                     throw new WinookException(_resourceManager.GetString("HostApplicationFailed", CultureInfo.CurrentCulture));
+#else
+                    throw new WinookException("One of the Winook library host applications has failed.");
+#endif
                 }
                 else
                 {
+#if !NETSTANDARD
                     throw new WinookException(_resourceManager.GetString("HostApplicationsFailed", CultureInfo.CurrentCulture));
+#else
+                    throw new WinookException("The Winook library host applications have failed.");
+#endif
                 }
             }
         }
@@ -187,6 +201,6 @@
             }
         }
 
-        #endregion
+#endregion
     }
 }

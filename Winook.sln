@@ -20,6 +20,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Winook.Lib.Host", "src\Wino
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Winook", "src\Winook\Winook.csproj", "{E5984E13-442B-4833-AF21-A704B67A99AB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Winook.Core", "src\Winook.Core\Winook.Core.csproj", "{800700A9-E0BD-47DD-9095-318E2F4C7ADA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -74,6 +76,18 @@ Global
 		{E5984E13-442B-4833-AF21-A704B67A99AB}.Release|x64.Build.0 = Release|Any CPU
 		{E5984E13-442B-4833-AF21-A704B67A99AB}.Release|x86.ActiveCfg = Release|Any CPU
 		{E5984E13-442B-4833-AF21-A704B67A99AB}.Release|x86.Build.0 = Release|Any CPU
+		{800700A9-E0BD-47DD-9095-318E2F4C7ADA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{800700A9-E0BD-47DD-9095-318E2F4C7ADA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{800700A9-E0BD-47DD-9095-318E2F4C7ADA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{800700A9-E0BD-47DD-9095-318E2F4C7ADA}.Debug|x64.Build.0 = Debug|Any CPU
+		{800700A9-E0BD-47DD-9095-318E2F4C7ADA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{800700A9-E0BD-47DD-9095-318E2F4C7ADA}.Debug|x86.Build.0 = Debug|Any CPU
+		{800700A9-E0BD-47DD-9095-318E2F4C7ADA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{800700A9-E0BD-47DD-9095-318E2F4C7ADA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{800700A9-E0BD-47DD-9095-318E2F4C7ADA}.Release|x64.ActiveCfg = Release|Any CPU
+		{800700A9-E0BD-47DD-9095-318E2F4C7ADA}.Release|x64.Build.0 = Release|Any CPU
+		{800700A9-E0BD-47DD-9095-318E2F4C7ADA}.Release|x86.ActiveCfg = Release|Any CPU
+		{800700A9-E0BD-47DD-9095-318E2F4C7ADA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

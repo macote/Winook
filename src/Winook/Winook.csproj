@@ -49,49 +49,59 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Helper.cs" />
-    <Compile Include="HookType.cs" />
-    <Compile Include="KeyboardHook.cs" />
-    <Compile Include="HookBase.cs" />
-    <Compile Include="Modifiers.cs" />
-    <Compile Include="KeyboardMessageEventArg.cs" />
-    <Compile Include="KeyCode.cs" />
-    <Compile Include="KeyDirection.cs" />
-    <Compile Include="MessageEventArgs.cs" />
-    <Compile Include="MessageReceiver.cs" />
-    <Compile Include="MouseHook.cs" />
-    <Compile Include="MouseMessageCode.cs" />
-    <Compile Include="MouseMessageTypes.cs" />
+    <Compile Include="..\Winook.Core\Helper.cs">
+      <Link>Helper.cs</Link>
+    </Compile>
+    <Compile Include="..\Winook.Core\HookBase.cs">
+      <Link>HookBase.cs</Link>
+    </Compile>
+    <Compile Include="..\Winook.Core\HookType.cs">
+      <Link>HookType.cs</Link>
+    </Compile>
+    <Compile Include="..\Winook.Core\KeyboardHook.cs">
+      <Link>KeyboardHook.cs</Link>
+    </Compile>
+    <Compile Include="..\Winook.Core\KeyboardMessageEventArg.cs">
+      <Link>KeyboardMessageEventArg.cs</Link>
+    </Compile>
+    <Compile Include="..\Winook.Core\KeyCode.cs">
+      <Link>KeyCode.cs</Link>
+    </Compile>
+    <Compile Include="..\Winook.Core\KeyDirection.cs">
+      <Link>KeyDirection.cs</Link>
+    </Compile>
+    <Compile Include="..\Winook.Core\MessageEventArgs.cs">
+      <Link>MessageEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\Winook.Core\MessageReceiver.cs">
+      <Link>MessageReceiver.cs</Link>
+    </Compile>
+    <Compile Include="..\Winook.Core\Modifiers.cs">
+      <Link>Modifiers.cs</Link>
+    </Compile>
+    <Compile Include="..\Winook.Core\MouseHook.cs">
+      <Link>MouseHook.cs</Link>
+    </Compile>
+    <Compile Include="..\Winook.Core\MouseMessageCode.cs">
+      <Link>MouseMessageCode.cs</Link>
+    </Compile>
+    <Compile Include="..\Winook.Core\MouseMessageEventArgs.cs">
+      <Link>MouseMessageEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\Winook.Core\MouseMessageTypes.cs">
+      <Link>MouseMessageTypes.cs</Link>
+    </Compile>
+    <Compile Include="..\Winook.Core\WinookException.cs">
+      <Link>WinookException.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="WinookException.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="winook.support\Winook.Lib.Host.x64.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="winook.support\Winook.Lib.Host.x86.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="winook.support\Winook.Lib.Keyboard.x64.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="winook.support\Winook.Lib.Keyboard.x86.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="winook.support\Winook.Lib.Mouse.x64.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="winook.support\Winook.Lib.Mouse.x86.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="MouseMessageEventArgs.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -110,6 +120,26 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\Winook.Core\winook.support\Winook.Lib.Host.x64.exe">
+      <Link>winook.support\Winook.Lib.Host.x64.exe</Link>
+    </Content>
+    <Content Include="..\Winook.Core\winook.support\Winook.Lib.Host.x86.exe">
+      <Link>winook.support\Winook.Lib.Host.x86.exe</Link>
+    </Content>
+    <Content Include="..\Winook.Core\winook.support\Winook.Lib.Keyboard.x64.dll">
+      <Link>winook.support\Winook.Lib.Keyboard.x64.dll</Link>
+    </Content>
+    <Content Include="..\Winook.Core\winook.support\Winook.Lib.Keyboard.x86.dll">
+      <Link>winook.support\Winook.Lib.Keyboard.x86.dll</Link>
+    </Content>
+    <Content Include="..\Winook.Core\winook.support\Winook.Lib.Mouse.x64.dll">
+      <Link>winook.support\Winook.Lib.Mouse.x64.dll</Link>
+    </Content>
+    <Content Include="..\Winook.Core\winook.support\Winook.Lib.Mouse.x86.dll">
+      <Link>winook.support\Winook.Lib.Mouse.x86.dll</Link>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
