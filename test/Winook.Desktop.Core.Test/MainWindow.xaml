@@ -1,0 +1,19 @@
+﻿<Window x:Class="Winook.Desktop.Core.Test.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Winook.Desktop.Core.Test"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="250" Width="600">
+    <Grid>
+        <Button x:Name="mouseButton" Content="Mouse Hook" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="mouseButton_Click" Width="150" Height="25"/>
+        <CheckBox x:Name="ignoreMove" Content="Ignore move messages" HorizontalAlignment="Left" Margin="10,40,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="keyboardButton" Content="Keyboard Hook" HorizontalAlignment="Left" Margin="10,60,0,0" VerticalAlignment="Top" Width="150" Height="25"/>
+        <RadioButton x:Name="radio32bit" Content="32-bit" HorizontalAlignment="Left" Margin="10,90,0,0" VerticalAlignment="Top" IsChecked="True" Width="54"/>
+        <RadioButton x:Name="radio64bit" Content="64-bit" HorizontalAlignment="Left" Margin="67,90,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="mouseLabel" Content="Mouse messages" HorizontalAlignment="Left" Margin="10,110,0,0" VerticalAlignment="Top" Width="299"/>
+        <Label x:Name="keyboardLabel" Content="Keyboard messages" HorizontalAlignment="Left" Margin="10,141,0,0" VerticalAlignment="Top" Width="299"/>
+        <Label x:Name="testLabel" Content="Test messages" HorizontalAlignment="Left" Margin="10,172,0,0" VerticalAlignment="Top" Width="299"/>
+    </Grid>
+</Window>
