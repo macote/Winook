@@ -13,7 +13,8 @@
         private const int HookMessageSizeInBytes = 24;
         private const HookType MouseHookType = HookType.Mouse; // WH_MOUSE
 
-        private Dictionary<int, MouseEventHandler> _messageHandlers = new Dictionary<int, MouseEventHandler>();
+        private readonly Dictionary<int, MouseEventHandler> _messageHandlers = new Dictionary<int, MouseEventHandler>();
+
         private bool _disposed = false;
 
         #endregion
@@ -65,7 +66,9 @@
         {
             if (handler == null)
             {
+#pragma warning disable IDE0016 // Use 'throw' expression
                 throw new ArgumentNullException(nameof(handler));
+#pragma warning restore IDE0016 // Use 'throw' expression
             }
 
             if (!_messageHandlers.ContainsKey(mouseMessageCode))

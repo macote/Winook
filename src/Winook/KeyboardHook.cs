@@ -12,7 +12,8 @@
         private const int HookMessageSizeInBytes = 8;
         private const HookType KeyboardHookType = HookType.Keyboard; // WH_KEYBOARD
 
-        private Dictionary<uint, KeyboardEventHandler> _messageHandlers = new Dictionary<uint, KeyboardEventHandler>();
+        private readonly Dictionary<uint, KeyboardEventHandler> _messageHandlers = new Dictionary<uint, KeyboardEventHandler>();
+
         private bool _disposed = false;
 
         #endregion
