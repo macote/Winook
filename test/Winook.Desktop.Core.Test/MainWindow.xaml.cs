@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Windows;
+using Winook;
 
 namespace Winook.Desktop.Core.Test
 {

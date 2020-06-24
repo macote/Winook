@@ -2,7 +2,19 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <PackageId>Winook.Standard</PackageId>
+    <Title>Winook Library</Title>
+    <Description>Winook is a .NET library to install thread-level hooks.</Description>
+    <Product>Winook Library</Product>
+    <Copyright>Copyright © Marc-André Côté</Copyright>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>    
+    <PackageId>Winook</PackageId>
+    <PackageVersion>1.0.1</PackageVersion>
+    <Authors>Marc-André Côté</Authors>
+    <Description>Winook is a .NET library to install thread-level hooks.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/macote/Winook</PackageProjectUrl>
+    <PackageTags>windows api .net dll hook message event thread keyboard mouse</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,6 +36,15 @@
     <None Update="winook.support\Winook.Lib.Mouse.x86.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="winook.support\*">
+      <Pack>true</Pack>
+      <PackagePath>contentFiles\any\netstandard2.0\winook.support\</PackagePath>
+      <BuildAction>None</BuildAction>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+    </Content>
   </ItemGroup>
 
 </Project>
