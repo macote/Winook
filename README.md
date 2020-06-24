@@ -2,7 +2,7 @@
 
 [![nuget][nuget-badge]][nuget-url]
 
-[nuget-badge]: https://img.shields.io/badge/nuget-v1.0.1-blue.svg
+[nuget-badge]: https://img.shields.io/badge/nuget-v1.1.0-blue.svg
 [nuget-url]: https://www.nuget.org/packages/Winook
 
 Winook is a Windows library that let you install thread-level hooks inside processes. This library offers an alternative to solutions that use global hooks. With thread-level hooks, performance and management issues can be avoided.
