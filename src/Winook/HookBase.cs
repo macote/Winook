@@ -23,13 +23,13 @@
         private readonly MessageReceiver _messageReceiver;
         private readonly HookType _hookType;
         private readonly Guid _libHostMutexGuid = Guid.NewGuid();
+        private readonly List<string> _additionalHostArguments = new List<string>();
+        private readonly ResourceManager _resourceManager = new ResourceManager(typeof(Properties.Resources));
+
         private Process _libHostProcess;
         private Process _libHostProcess64;
         private ManualResetEventSlim _libHostMutexReleaseEvent;
-        private List<string> _additionalHostArguments = new List<string>();
         private bool _disposed = false;
-
-        private ResourceManager _resourceManager = new ResourceManager(typeof(Properties.Resources));
 
         #endregion
 

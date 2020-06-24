@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)winook.support\Winook.Lib.Host.x64.exe">
+      <Link>winook.support\Winook.Lib.Host.x64.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)winook.support\Winook.Lib.Host.x86.exe">
+      <Link>winook.support\Winook.Lib.Host.x86.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)winook.support\Winook.Lib.Keyboard.x64.dll">
+      <Link>winook.support\Winook.Lib.Keyboard.x64.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)winook.support\Winook.Lib.Keyboard.x86.dll">
+      <Link>winook.support\Winook.Lib.Keyboard.x86.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)winook.support\Winook.Lib.Mouse.x64.dll">
+      <Link>winook.support\Winook.Lib.Mouse.x64.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)winook.support\Winook.Lib.Mouse.x86.dll">
+      <Link>winook.support\Winook.Lib.Mouse.x86.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>  
+</Project>

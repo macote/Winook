@@ -10,7 +10,8 @@
     {
         #region Fields
 
-        private int _messageByteSize;
+        private readonly int _messageByteSize;
+
         private TcpListener _tcpListener;
         private CancellationTokenSource _cancellationTokenSource;
         private CancellationToken _cancellationToken;
