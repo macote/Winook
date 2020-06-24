@@ -56,4 +56,4 @@ obj/%.o: %.cpp | obj
 	$(CC) $(CFLAGS) -c "$<" -o "$@"
 
 bin/$(EXE): $(OBJECTS) | bin
-	$(CC) $(LDFLAGS) -o "$@" $(OBJECTS)
+	$(CC) -o "$@" $(OBJECTS) $(LDFLAGS)
