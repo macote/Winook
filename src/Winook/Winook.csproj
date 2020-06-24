@@ -60,4 +60,15 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="Properties\Winook.props">
+      <Pack>true</Pack>
+      <PackagePath>build\net45\</PackagePath>
+    </None>
+    <None Include="winook.support\*">
+      <Pack>true</Pack>
+      <PackagePath>build\net45\winook.support\</PackagePath>
+    </None>
+  </ItemGroup>
+
 </Project>
