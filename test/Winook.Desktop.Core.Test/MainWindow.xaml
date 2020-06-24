@@ -12,8 +12,8 @@
         <Button x:Name="keyboardButton" Content="Keyboard Hook" HorizontalAlignment="Left" Margin="10,60,0,0" VerticalAlignment="Top" Click="keyboardButton_Click" Width="150" Height="25"/>
         <RadioButton x:Name="radio32bit" Content="32-bit" HorizontalAlignment="Left" Margin="10,90,0,0" VerticalAlignment="Top" IsChecked="True" Width="54"/>
         <RadioButton x:Name="radio64bit" Content="64-bit" HorizontalAlignment="Left" Margin="67,90,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="mouseLabel" Content="Mouse messages" HorizontalAlignment="Left" Margin="10,110,0,0" VerticalAlignment="Top" Width="299"/>
-        <Label x:Name="keyboardLabel" Content="Keyboard messages" HorizontalAlignment="Left" Margin="10,141,0,0" VerticalAlignment="Top" Width="299"/>
-        <Label x:Name="testLabel" Content="Test messages" HorizontalAlignment="Left" Margin="10,172,0,0" VerticalAlignment="Top" Width="299"/>
+        <Label x:Name="mouseLabel" Content="Mouse messages" HorizontalAlignment="Center" Margin="0,110,0,0" VerticalAlignment="Top" Width="580"/>
+        <Label x:Name="keyboardLabel" Content="Keyboard messages" HorizontalAlignment="Center" Margin="0,141,0,0" VerticalAlignment="Top" Width="580"/>
+        <Label x:Name="testLabel" Content="Test messages" HorizontalAlignment="Center" Margin="0,172,0,0" VerticalAlignment="Top" Width="580"/>
     </Grid>
 </Window>

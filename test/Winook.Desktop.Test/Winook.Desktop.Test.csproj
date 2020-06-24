@@ -83,7 +83,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Winook\Winook.csproj">
-      <Project>{e5984e13-442b-4833-af21-a704b67a99ab}</Project>
+      <Project>{800700a9-e0bd-47dd-9095-318e2f4c7ada}</Project>
       <Name>Winook</Name>
     </ProjectReference>
   </ItemGroup>
