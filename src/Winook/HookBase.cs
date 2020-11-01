@@ -155,7 +155,7 @@
             => $"{(int)_hookType} {_messageReceiver.Port} {_processId} {_libHostMutexGuid}";
 
         private string GetHostArguments()
-            => GetBaseHostArguments() + " " + string.Concat(_additionalHostArguments.ToList());
+            => GetBaseHostArguments() + " " + string.Join(" ", _additionalHostArguments);
 
         private void CheckLibHostsStatus(out bool hostRunning, out bool host64Running, out int exitCode, out int exitCode64)
         {

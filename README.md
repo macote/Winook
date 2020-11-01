@@ -20,7 +20,7 @@ Winook uses host processes and dll injection to setup hooks. Both 32-bit and 64-
 
 ## Application
 - Game Helpers 
-  - Winook can be used in game helpers. In-game keboard and mouse events can be tied to event handlers in your application. For example, Winook is used in [Poe Lurker](https://github.com/C1rdec/Poe-Lurker) to provide additional trading functionality.
+  - Winook can be used in game helpers. In-game keyboard and mouse events can be tied to event handlers in your application. For example, Winook is used in [Poe Lurker](https://github.com/C1rdec/Poe-Lurker) to provide additional trading functionality.
 - Application Inspection
   - Winook can be used as a telemetry inspection tool.
 - Other Uses
