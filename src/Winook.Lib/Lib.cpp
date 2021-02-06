@@ -21,7 +21,8 @@
 TimestampLogger Logger = TimestampLogger(LOGWINOOKLIBPATH + TimestampLogger::GetTimestampString(TRUE) + TEXT(".log"), TRUE);
 #endif
 
-MessageSender messagesender;
+asio::io_context io_context;
+MessageSender messagesender(io_context); 
 WORD shiftctrlalt{};
 WORD mousemessagetypes;
 

@@ -2,12 +2,7 @@
 
 #include <Windows.h>
 
-#include <winsock2.h>
-#include <ws2tcpip.h>
-
-#if !defined(__MINGW32__)
-#pragma comment (lib, "ws2_32.lib")
-#endif
+#include "asio.hpp"
 
 #define LOGWINOOKMESSAGESENDER 1
 #if _DEBUG && LOGWINOOKMESSAGESENDER
@@ -17,78 +12,52 @@
 TimestampLogger MessageSenderLogger = TimestampLogger(LOGWINOOKMESSAGESENDERPATH + TimestampLogger::GetTimestampString(TRUE) + TEXT(".log"), TRUE);
 #endif
 
+using asio::ip::tcp;
+
 class MessageSender
 {
 public:
-    MessageSender()
-#if _DEBUG && LOGWINOOKMESSAGESENDER
-        : logger_(TimestampLogger(LOGWINOOKMESSAGESENDERPATH + TimestampLogger::GetTimestampString(TRUE) + L".log", TRUE))
-#endif
+    MessageSender(asio::io_context& io_context)
+        : io_context_(io_context), socket_(tcp::socket(io_context))
     {
-        WSADATA wsadata;
-        if (WSAStartup(MAKEWORD(2, 2), &wsadata))
-        {
-            throw std::runtime_error("WSAStartup() failed");
-        }
     }
     ~MessageSender()
     {
-        if (addrinfo_ != NULL)
-        {
-            freeaddrinfo(addrinfo_);
-        }
-
-        if (socket_ != INVALID_SOCKET)
-        {
-            closesocket(socket_);
-        }
-
-        if (!WSACleanup())
-        {
-            lasterror_ = WSAGetLastError();
-        }
+        io_context_.run();
     }
     void Connect(std::string port);
     void SendMessage(void* data, size_t bytecount);
 private:
-    SOCKET socket_{ INVALID_SOCKET };
-    int lasterror_{};
-    struct addrinfo* addrinfo_{ NULL };
-#if _DEBUG && LOGWINOOK
-    TimestampLogger logger_;
-#endif
+    asio::io_context& io_context_;
+    tcp::socket socket_;
+    asio::error_code ignorederror_;
 };
 
 inline void MessageSender::Connect(std::string port)
 {
-    struct addrinfo hints{};
-    int result;
-
-    hints.ai_family = AF_INET;
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_protocol = IPPROTO_TCP;
-
-    result = getaddrinfo("127.0.0.1", port.c_str(), &hints, &addrinfo_);
-    if (result != 0) {
-        lasterror_ = result;
-        throw std::runtime_error("getaddrinfo() failed");
-    }
-
-    socket_ = socket(addrinfo_->ai_family, addrinfo_->ai_socktype, addrinfo_->ai_protocol);
-    if (socket_ == INVALID_SOCKET) {
-        lasterror_ = WSAGetLastError();
-        throw std::runtime_error("socket() failed");
-    }
-
-    result = connect(socket_, addrinfo_->ai_addr, (int)addrinfo_->ai_addrlen);
-    if (result == SOCKET_ERROR)
+    tcp::resolver resolver(io_context_);
+    auto endpoints = resolver.resolve("127.0.0.1", port);
+    std::error_code error;
+    asio::connect(
+        socket_,
+        endpoints,
+        error);
+    if (error)
     {
-        lasterror_ = WSAGetLastError();
-        throw std::runtime_error("Failed to connect to server");
+        // TODO: handle error
     }
 }
 
 inline void MessageSender::SendMessage(void* data, size_t bytecount)
 {
-    send(socket_, reinterpret_cast<const char*>(data), static_cast<int>(bytecount), 0);
+    asio::async_write(
+        socket_,
+        asio::buffer(data, bytecount),
+        [this](std::error_code ec, std::size_t)
+        {
+            if (ec)
+            {
+                socket_.close();
+            }
+        });
 }

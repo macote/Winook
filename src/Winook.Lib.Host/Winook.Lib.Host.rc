@@ -32,8 +32,8 @@ CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST             "application.manifest
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,1,0,0
- PRODUCTVERSION 1,1,0,0
+ FILEVERSION 1,1,1,0
+ PRODUCTVERSION 1,1,1,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -49,10 +49,10 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "FileDescription", "Winook Library Host Application"
-            VALUE "FileVersion", "1.1.0.0"
+            VALUE "FileVersion", "1.1.1.0"
             VALUE "LegalCopyright", "Copyright © Marc-André Côté"
             VALUE "ProductName", "Winook Library Host Application"
-            VALUE "ProductVersion", "1.1.0"
+            VALUE "ProductVersion", "1.1.1"
         END
     END
     BLOCK "VarFileInfo"
