@@ -68,7 +68,7 @@
         {
             testLabel.Invoke((MethodInvoker)delegate
             {
-                testLabel.Text = $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}";
+                testLabel.Text = $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}; XButtons: {e.XButtons}";
             });
         }
 
@@ -76,7 +76,7 @@
         {
             mouseLabel.Invoke((MethodInvoker)delegate
             {
-                mouseLabel.Text = $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}";
+                mouseLabel.Text = $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}; XButtons: {e.XButtons}";
             });
         }
 
@@ -84,7 +84,7 @@
         {
             testLabel.Invoke((MethodInvoker)delegate
             {
-                testLabel.Text = $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}";
+                testLabel.Text = $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}; XButtons: {e.XButtons}";
             });
         }
 
