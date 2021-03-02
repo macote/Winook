@@ -57,6 +57,8 @@ inline void MessageSender::SendMessage(void* data, size_t bytecount)
         {
             if (ec)
             {
+                // TODO: handle error
+
                 socket_.close();
             }
         });
