@@ -14,6 +14,9 @@
         NCMiddleButtonDown = 0x00A7, // WM_NCMBUTTONDOWN
         NCMiddleButtonUp = 0x00A8, // WM_NCMBUTTONUP
         NCMiddleButtonDblClk = 0x00A9, // WM_NCMBUTTONDBLCLK
+        NCXButtonDown = 0x00AB, // WM_NCXBUTTONDOWN
+        NCXButtonUp = 0x00AC, // WM_NCXBUTTONUP
+        NCXButtonDblClk = 0x00AD, // WM_NCXBUTTONDBLCLK
         MouseMove = 0x0200, // WM_MOUSEMOVE
         LeftButtonDown = 0x0201, // WM_LBUTTONDOWN
         LeftButtonUp = 0x0202, // WM_LBUTTONUP
