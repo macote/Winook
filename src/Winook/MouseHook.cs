@@ -102,6 +102,7 @@
                 Handle = BitConverter.ToInt32(e.Bytes, 12),
                 HitTestCode = BitConverter.ToInt32(e.Bytes, 16),
                 Delta = BitConverter.ToInt16(e.Bytes, 20),
+                XButtons = BitConverter.ToInt16(e.Bytes, 20),
             };
 
             Debug.WriteLine($"Code: {eventArgs.MessageCode}; X: {eventArgs.X}; Y: {eventArgs.Y}; Delta: {eventArgs.Delta}");

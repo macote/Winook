@@ -11,6 +11,7 @@
         public int Handle;
         public int HitTestCode;
         public short Delta;
+        public short XButtons;
     }
 #pragma warning restore CA1051 // Do not declare visible instance fields
 }

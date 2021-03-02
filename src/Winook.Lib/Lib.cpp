@@ -217,7 +217,10 @@ LRESULT CALLBACK MouseHookProc(int code, WPARAM wParam, LPARAM lParam)
                 || messagecode == WM_NCRBUTTONDBLCLK
                 || messagecode == WM_NCMBUTTONDOWN
                 || messagecode == WM_NCMBUTTONUP
-                || messagecode == WM_NCMBUTTONDBLCLK) << 3
+                || messagecode == WM_NCMBUTTONDBLCLK
+                || messagecode == WM_NCXBUTTONDOWN
+                || messagecode == WM_NCXBUTTONUP
+                || messagecode == WM_NCXBUTTONDBLCLK) << 3
             | (messagecode == WM_MOUSEACTIVATE
                 || messagecode == WM_MOUSEWHEEL
                 || messagecode == WM_MOUSEHWHEEL
@@ -247,14 +250,20 @@ LRESULT CALLBACK MouseHookProc(int code, WPARAM wParam, LPARAM lParam)
         {
             HookMouseMessage hmm{};
             hmm.messageCode = messagecode;
-            if (wParam == WM_MOUSEWHEEL)
+            if (wParam == WM_MOUSEWHEEL
+                || wParam == WM_XBUTTONDOWN
+                || wParam == WM_XBUTTONUP
+                || wParam == WM_XBUTTONDBLCLK
+                || wParam == WM_NCXBUTTONDOWN
+                || wParam == WM_NCXBUTTONUP
+                || wParam == WM_NCXBUTTONDBLCLK)
             {
                 auto pmhsx = (PMOUSEHOOKSTRUCTEX)lParam;
                 hmm.pointX = pmhsx->pt.x;
                 hmm.pointY = pmhsx->pt.y;
                 hmm.hwnd = (DWORD)PtrToInt(pmhsx->hwnd);
                 hmm.hitTestCode = (DWORD)pmhsx->wHitTestCode;
-                hmm.zDelta = HIWORD(pmhsx->mouseData);
+                hmm.extra = HIWORD(pmhsx->mouseData);
             }
             else
             {
