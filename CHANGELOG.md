@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0 (2021-03-02)
+
+### Added
+
+- #22: Add code to identify XButtons
+
 ## 1.1.1 (2021-02-09)
 
 ### Fixed

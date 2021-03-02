@@ -101,10 +101,23 @@
                 Y = BitConverter.ToInt32(e.Bytes, 8),
                 Handle = BitConverter.ToInt32(e.Bytes, 12),
                 HitTestCode = BitConverter.ToInt32(e.Bytes, 16),
-                Delta = BitConverter.ToInt16(e.Bytes, 20),
             };
 
-            Debug.WriteLine($"Code: {eventArgs.MessageCode}; X: {eventArgs.X}; Y: {eventArgs.Y}; Delta: {eventArgs.Delta}");
+            if (eventArgs.MessageCode == (int)MouseMessageCode.MouseWheel)
+            {
+                eventArgs.Delta = BitConverter.ToInt16(e.Bytes, 20);
+            }
+            else if (eventArgs.MessageCode == (int)MouseMessageCode.NCXButtonDown
+                || eventArgs.MessageCode == (int)MouseMessageCode.NCXButtonUp
+                || eventArgs.MessageCode == (int)MouseMessageCode.NCXButtonDblClk
+                || eventArgs.MessageCode == (int)MouseMessageCode.XButtonDown
+                || eventArgs.MessageCode == (int)MouseMessageCode.XButtonUp
+                || eventArgs.MessageCode == (int)MouseMessageCode.XButtonDblClk)
+            {
+                eventArgs.XButtons = BitConverter.ToInt16(e.Bytes, 20);
+            }
+
+            Debug.WriteLine($"Code: {eventArgs.MessageCode}; X: {eventArgs.X}; Y: {eventArgs.Y}; Delta: {eventArgs.Delta}; XButtons: {eventArgs.XButtons}");
 
             MessageReceived?.Invoke(this, eventArgs);
 

@@ -71,7 +71,7 @@ namespace Winook.Desktop.Core.Test
         {
             testLabel.Dispatcher.BeginInvoke(new Action(() =>
             {
-                testLabel.Content = $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}";
+                testLabel.Content = $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}; XButtons: {e.XButtons}";
             }));
         }
 
@@ -79,7 +79,7 @@ namespace Winook.Desktop.Core.Test
         {
             mouseLabel.Dispatcher.BeginInvoke(new Action(() =>
             {
-                mouseLabel.Content = $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}";
+                mouseLabel.Content = $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}; XButtons: {e.XButtons}";
             }));
         }
 
@@ -87,7 +87,7 @@ namespace Winook.Desktop.Core.Test
         {
             testLabel.Dispatcher.BeginInvoke(new Action(() =>
             {
-                testLabel.Content = $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}";
+                testLabel.Content = $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}; XButtons: {e.XButtons}";
             }));
         }
 
