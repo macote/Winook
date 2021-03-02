@@ -2,7 +2,7 @@
 
 [![nuget][nuget-badge]][nuget-url]
 
-[nuget-badge]: https://img.shields.io/badge/nuget-v1.1.1-blue.svg
+[nuget-badge]: https://img.shields.io/badge/nuget-v1.2.0-blue.svg
 [nuget-url]: https://www.nuget.org/packages/Winook
 
 Winook is a Windows library that let you install thread-level hooks inside processes. This library offers an alternative to solutions that use global hooks. With thread-level hooks, performance and management issues can be avoided.
@@ -54,7 +54,7 @@ _keyboardHook.InstallAsync();
 
 private void MouseHook_MessageReceived(object sender, MouseMessageEventArgs e)
 {
-    Debug.WriteLine($"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}");
+    Debug.WriteLine($"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}; XButtons: {e.XButtons}");
 }
 
 private void KeyboardHook_MessageReceived(object sender, KeyboardMessageEventArgs e)
