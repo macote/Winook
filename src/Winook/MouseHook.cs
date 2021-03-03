@@ -103,16 +103,17 @@
                 HitTestCode = BitConverter.ToInt32(e.Bytes, 16),
             };
 
-            if (eventArgs.MessageCode == (int)MouseMessageCode.MouseWheel)
+            var messageCode = GetMessageCode(eventArgs.MessageCode);
+            if (messageCode == MouseMessageCode.MouseWheel)
             {
                 eventArgs.Delta = BitConverter.ToInt16(e.Bytes, 20);
             }
-            else if (eventArgs.MessageCode == (int)MouseMessageCode.NCXButtonDown
-                || eventArgs.MessageCode == (int)MouseMessageCode.NCXButtonUp
-                || eventArgs.MessageCode == (int)MouseMessageCode.NCXButtonDblClk
-                || eventArgs.MessageCode == (int)MouseMessageCode.XButtonDown
-                || eventArgs.MessageCode == (int)MouseMessageCode.XButtonUp
-                || eventArgs.MessageCode == (int)MouseMessageCode.XButtonDblClk)
+            else if (messageCode == MouseMessageCode.NCXButtonDown
+                || messageCode == MouseMessageCode.NCXButtonUp
+                || messageCode == MouseMessageCode.NCXButtonDblClk
+                || messageCode == MouseMessageCode.XButtonDown
+                || messageCode == MouseMessageCode.XButtonUp
+                || messageCode == MouseMessageCode.XButtonDblClk)
             {
                 eventArgs.XButtons = BitConverter.ToInt16(e.Bytes, 20);
             }
@@ -121,7 +122,7 @@
 
             MessageReceived?.Invoke(this, eventArgs);
 
-            switch (GetMessageCode(eventArgs.MessageCode))
+            switch (messageCode)
             {
                 case MouseMessageCode.MouseMove:
                     MouseMove?.Invoke(this, eventArgs);
