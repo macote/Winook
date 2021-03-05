@@ -54,13 +54,13 @@ _keyboardHook.InstallAsync();
 
 private void MouseHook_MessageReceived(object sender, MouseMessageEventArgs e)
 {
-    Debug.WriteLine($"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}; XButtons: {e.XButtons}");
+  Debug.WriteLine($"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}; XButtons: {e.XButtons}");
 }
 
 private void KeyboardHook_MessageReceived(object sender, KeyboardMessageEventArgs e)
 {
-    Debug.Write($"Code: {e.KeyValue}; Modifiers: {e.Modifiers:x}; Flags: {e.Flags:x}; ");
-    Debug.WriteLine($"Shift: {e.Shift}; Control: {e.Control}; Alt: {e.Alt}; Direction: {e.Direction}");
+  Debug.Write($"Code: {e.KeyValue}; Modifiers: {e.Modifiers:x}; Flags: {e.Flags:x}; ");
+  Debug.WriteLine($"Shift: {e.Shift}; Control: {e.Control}; Alt: {e.Alt}; Direction: {e.Direction}");
 }
 
 ```
