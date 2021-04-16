@@ -23,7 +23,6 @@ TimestampLogger Logger = TimestampLogger(LOGWINOOKLIBPATH + TimestampLogger::Get
 
 asio::io_context io_context;
 MessageSender messagesender(io_context); 
-WORD shiftctrlalt{};
 WORD mousemessagetypes;
 
 BOOL WINAPI DllMain(HINSTANCE hinst, DWORD fdwReason, LPVOID lpReserved)
@@ -82,29 +81,6 @@ BOOL Initialize(HINSTANCE hinst)
     if (StrStrI(dllfilepath, kKeyboardHookLibName.c_str()) != NULL)
     {
         hooktype = WH_KEYBOARD;
-        const auto lshift = GetKeyState(VK_LSHIFT);
-        const auto lcontrol = GetKeyState(VK_LCONTROL);
-        const auto lalt = GetKeyState(VK_LMENU);
-        const auto rshift = GetKeyState(VK_RSHIFT);
-        const auto rcontrol = GetKeyState(VK_RCONTROL);
-        const auto ralt = GetKeyState(VK_RMENU);
-#if _DEBUG
-        std::bitset<16> shiftctrlaltbits1(shiftctrlalt);
-        LogDll(std::string("shiftctrlalt init before: ") + shiftctrlaltbits1.to_string());
-#endif
-        shiftctrlalt = (lshift < 0) << kLeftShiftBitIndex
-            | (lcontrol < 0) << kLeftControlBitIndex
-            | (lalt < 0) << kLeftAltBitIndex
-            | (rshift < 0) << kRightShiftBitIndex
-            | (rcontrol < 0) << kRightControlBitIndex
-            | (ralt < 0) << kRightAltBitIndex
-            | (lshift < 0 || rshift < 0) << kShiftBitIndex
-            | (lcontrol < 0 || rcontrol < 0) << kControlBitIndex
-            | (lalt < 0 || ralt < 0) << kAltBitIndex;
-#if _DEBUG
-        std::bitset<16> shiftctrlaltbits2(shiftctrlalt);
-        LogDll(std::string("shiftctrlalt init after: ") + shiftctrlaltbits2.to_string());
-#endif
     }
     else if (StrStrI(dllfilepath, kMouseHookLibName.c_str()) != NULL)
     {
@@ -136,32 +112,6 @@ BOOL Initialize(HINSTANCE hinst)
     return TRUE;
 }
 
-WORD UpdateShiftCtrlAltState(WORD current, INT bitindex, INT down)
-{
-#if _DEBUG
-    std::bitset<16> shiftctrlaltbits1(current);
-    LogDll(std::string("UpdateShiftCtrlAltState() before: ") + shiftctrlaltbits1.to_string());
-    LogDll(std::string("bitindex: ") + std::to_string(bitindex));
-    LogDll(std::string("down: ") + std::to_string(down));
-#endif
-    BITMASK_CLEAR(current, 7);
-    const auto temp = down ? BIT_SET(current, bitindex) : BIT_CLEAR(current, bitindex);
-#if _DEBUG
-    const auto temp2 = temp
-        | (BIT_CHECK(temp, kLeftShiftBitIndex) || BIT_CHECK(temp, kRightShiftBitIndex)) << kShiftBitIndex
-        | (BIT_CHECK(temp, kLeftControlBitIndex) || BIT_CHECK(temp, kRightControlBitIndex)) << kControlBitIndex
-        | (BIT_CHECK(temp, kLeftAltBitIndex) || BIT_CHECK(temp, kRightAltBitIndex)) << kAltBitIndex;
-    std::bitset<16> shiftctrlaltbits2(temp2);
-    LogDll(std::string("UpdateShiftCtrlAltState() after: ") + shiftctrlaltbits2.to_string());
-    return temp2;
-#else
-    return temp
-        | (BIT_CHECK(temp, kLeftShiftBitIndex) || BIT_CHECK(temp, kRightShiftBitIndex)) << kShiftBitIndex
-        | (BIT_CHECK(temp, kLeftControlBitIndex) || BIT_CHECK(temp, kRightControlBitIndex)) << kControlBitIndex
-        | (BIT_CHECK(temp, kLeftAltBitIndex) || BIT_CHECK(temp, kRightAltBitIndex)) << kAltBitIndex;
-#endif
-}
-
 LRESULT CALLBACK KeyboardHookProc(int code, WPARAM wParam, LPARAM lParam)
 {
 #if _DEBUG
@@ -169,23 +119,21 @@ LRESULT CALLBACK KeyboardHookProc(int code, WPARAM wParam, LPARAM lParam)
 #endif
     if (code == HC_ACTION)
     {
-        switch ((DWORD)wParam)
-        {
-        case VK_SHIFT:
-            shiftctrlalt = UpdateShiftCtrlAltState(shiftctrlalt, kLeftShiftBitIndex, GetKeyState(VK_LSHIFT) < 0);
-            shiftctrlalt = UpdateShiftCtrlAltState(shiftctrlalt, kRightShiftBitIndex, GetKeyState(VK_RSHIFT) < 0);
-            break;
-        case VK_CONTROL:
-            shiftctrlalt = UpdateShiftCtrlAltState(shiftctrlalt, kLeftControlBitIndex, GetKeyState(VK_LCONTROL) < 0);
-            shiftctrlalt = UpdateShiftCtrlAltState(shiftctrlalt, kRightControlBitIndex, GetKeyState(VK_RCONTROL) < 0);
-            break;
-        case VK_MENU:
-            shiftctrlalt = UpdateShiftCtrlAltState(shiftctrlalt, kLeftAltBitIndex, GetKeyState(VK_LMENU) < 0);
-            shiftctrlalt = UpdateShiftCtrlAltState(shiftctrlalt, kRightAltBitIndex, GetKeyState(VK_RMENU) < 0);
-            break;
-        default:
-            break;
-        }
+        const auto lshift = GetKeyState(VK_LSHIFT);
+        const auto lcontrol = GetKeyState(VK_LCONTROL);
+        const auto lalt = GetKeyState(VK_LMENU);
+        const auto rshift = GetKeyState(VK_RSHIFT);
+        const auto rcontrol = GetKeyState(VK_RCONTROL);
+        const auto ralt = GetKeyState(VK_RMENU);
+        const WORD shiftctrlalt = (lshift < 0) << kLeftShiftBitIndex
+            | (lcontrol < 0) << kLeftControlBitIndex
+            | (lalt < 0) << kLeftAltBitIndex
+            | (rshift < 0) << kRightShiftBitIndex
+            | (rcontrol < 0) << kRightControlBitIndex
+            | (ralt < 0) << kRightAltBitIndex
+            | (lshift < 0 || rshift < 0) << kShiftBitIndex
+            | (lcontrol < 0 || rcontrol < 0) << kControlBitIndex
+            | (lalt < 0 || ralt < 0) << kAltBitIndex;
 
         HookKeyboardMessage hkm;
         hkm.keyCode = (WORD)wParam;
