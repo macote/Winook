@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.1 (2021-04-15)
+
+### Fixed
+
+- #24: Fix Shift, Control and Alt handling
+
 ## 1.2.0 (2021-03-02)
 
 ### Added
@@ -22,4 +28,4 @@
 
 ### Added
 
-- #19: Support .NET Standard 2.0
+- #17: Support .NET Standard 2.0
