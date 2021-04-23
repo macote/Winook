@@ -15,8 +15,8 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,2,1,0
- PRODUCTVERSION 1,2,1,0
+ FILEVERSION 1,3,0,0
+ PRODUCTVERSION 1,3,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -32,10 +32,10 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "FileDescription", "Winook Library"
-            VALUE "FileVersion", "1.2.1.0"
+            VALUE "FileVersion", "1.3.0.0"
             VALUE "LegalCopyright", "Copyright © Marc-André Côté"
             VALUE "ProductName", "Winook Library"
-            VALUE "ProductVersion", "1.2.1"
+            VALUE "ProductVersion", "1.3.0"
         END
     END
     BLOCK "VarFileInfo"
