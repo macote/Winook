@@ -112,6 +112,25 @@ BOOL Initialize(HINSTANCE hinst)
     return TRUE;
 }
 
+WORD GetShiftCtrlAltState()
+{
+    const auto lshift = GetKeyState(VK_LSHIFT);
+    const auto lcontrol = GetKeyState(VK_LCONTROL);
+    const auto lalt = GetKeyState(VK_LMENU);
+    const auto rshift = GetKeyState(VK_RSHIFT);
+    const auto rcontrol = GetKeyState(VK_RCONTROL);
+    const auto ralt = GetKeyState(VK_RMENU);
+    return (lshift < 0) << kLeftShiftBitIndex
+        | (lcontrol < 0) << kLeftControlBitIndex
+        | (lalt < 0) << kLeftAltBitIndex
+        | (rshift < 0) << kRightShiftBitIndex
+        | (rcontrol < 0) << kRightControlBitIndex
+        | (ralt < 0) << kRightAltBitIndex
+        | (lshift < 0 || rshift < 0) << kShiftBitIndex
+        | (lcontrol < 0 || rcontrol < 0) << kControlBitIndex
+        | (lalt < 0 || ralt < 0) << kAltBitIndex;
+}
+
 LRESULT CALLBACK KeyboardHookProc(int code, WPARAM wParam, LPARAM lParam)
 {
 #if _DEBUG
@@ -119,25 +138,9 @@ LRESULT CALLBACK KeyboardHookProc(int code, WPARAM wParam, LPARAM lParam)
 #endif
     if (code == HC_ACTION)
     {
-        const auto lshift = GetKeyState(VK_LSHIFT);
-        const auto lcontrol = GetKeyState(VK_LCONTROL);
-        const auto lalt = GetKeyState(VK_LMENU);
-        const auto rshift = GetKeyState(VK_RSHIFT);
-        const auto rcontrol = GetKeyState(VK_RCONTROL);
-        const auto ralt = GetKeyState(VK_RMENU);
-        const WORD shiftctrlalt = (lshift < 0) << kLeftShiftBitIndex
-            | (lcontrol < 0) << kLeftControlBitIndex
-            | (lalt < 0) << kLeftAltBitIndex
-            | (rshift < 0) << kRightShiftBitIndex
-            | (rcontrol < 0) << kRightControlBitIndex
-            | (ralt < 0) << kRightAltBitIndex
-            | (lshift < 0 || rshift < 0) << kShiftBitIndex
-            | (lcontrol < 0 || rcontrol < 0) << kControlBitIndex
-            | (lalt < 0 || ralt < 0) << kAltBitIndex;
-
-        HookKeyboardMessage hkm;
+        HookKeyboardMessage hkm{};
         hkm.keyCode = (WORD)wParam;
-        hkm.modifiers = shiftctrlalt;
+        hkm.modifiers = GetShiftCtrlAltState();
         hkm.flags = (DWORD)lParam;
         messagesender.SendMessage(&hkm, sizeof(HookKeyboardMessage));
     }
@@ -198,6 +201,7 @@ LRESULT CALLBACK MouseHookProc(int code, WPARAM wParam, LPARAM lParam)
         {
             HookMouseMessage hmm{};
             hmm.messageCode = messagecode;
+            hmm.modifiers = GetShiftCtrlAltState();
             if (wParam == WM_MOUSEWHEEL
                 || wParam == WM_XBUTTONDOWN
                 || wParam == WM_XBUTTONUP

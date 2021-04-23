@@ -10,7 +10,7 @@
     {
         #region Fields
 
-        private const int HookMessageSizeInBytes = 24;
+        private const int HookMessageSizeInBytes = 28;
         private const HookType MouseHookType = HookType.Mouse; // WH_MOUSE
 
         private readonly Dictionary<int, MouseEventHandler> _messageHandlers = new Dictionary<int, MouseEventHandler>();
@@ -94,6 +94,7 @@
         {
             Contract.Requires(e != null);
 
+            var modifiers = BitConverter.ToUInt16(e.Bytes, 24);
             var eventArgs = new MouseMessageEventArgs
             {
                 MessageCode = BitConverter.ToInt32(e.Bytes, 0),
@@ -101,6 +102,10 @@
                 Y = BitConverter.ToInt32(e.Bytes, 8),
                 Handle = BitConverter.ToInt32(e.Bytes, 12),
                 HitTestCode = BitConverter.ToInt32(e.Bytes, 16),
+                Modifiers = modifiers,
+                Shift = (modifiers & 0b100) > 0,
+                Control = (modifiers & 0b10) > 0,
+                Alt = (modifiers & 0b1) > 0,
             };
 
             var messageCode = GetMessageCode(eventArgs.MessageCode);
@@ -118,7 +123,8 @@
                 eventArgs.XButtons = BitConverter.ToInt16(e.Bytes, 20);
             }
 
-            Debug.WriteLine($"Code: {eventArgs.MessageCode}; X: {eventArgs.X}; Y: {eventArgs.Y}; Delta: {eventArgs.Delta}; XButtons: {eventArgs.XButtons}");
+            Debug.Write($"Code: {eventArgs.MessageCode}; X: {eventArgs.X}; Y: {eventArgs.Y}; Modifiers: {eventArgs.Modifiers:x}; ");
+            Debug.WriteLine($"Delta: {eventArgs.Delta}; XButtons: {eventArgs.XButtons}");
 
             MessageReceived?.Invoke(this, eventArgs);
 
