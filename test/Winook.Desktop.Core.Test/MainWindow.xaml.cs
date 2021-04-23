@@ -71,7 +71,8 @@ namespace Winook.Desktop.Core.Test
         {
             testLabel.Dispatcher.BeginInvoke(new Action(() =>
             {
-                testLabel.Content = $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}; XButtons: {e.XButtons}";
+                testLabel.Content = $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; " 
+                    + $"Modifiers: {e.Modifiers:x}; Delta: {e.Delta}; XButtons: {e.XButtons}";
             }));
         }
 
@@ -79,7 +80,8 @@ namespace Winook.Desktop.Core.Test
         {
             mouseLabel.Dispatcher.BeginInvoke(new Action(() =>
             {
-                mouseLabel.Content = $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}; XButtons: {e.XButtons}";
+                mouseLabel.Content = $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; "
+                    + $"Modifiers: {e.Modifiers:x}; Delta: {e.Delta}; XButtons: {e.XButtons}";
             }));
         }
 
@@ -87,7 +89,8 @@ namespace Winook.Desktop.Core.Test
         {
             testLabel.Dispatcher.BeginInvoke(new Action(() =>
             {
-                testLabel.Content = $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}; XButtons: {e.XButtons}";
+                testLabel.Content = $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; "
+                    + $"Modifiers: {e.Modifiers:x}; Delta: {e.Delta}; XButtons: {e.XButtons}";
             }));
         }
 
@@ -109,7 +112,8 @@ namespace Winook.Desktop.Core.Test
 
                 _keyboardHook = new KeyboardHook(_process.Id);
                 _keyboardHook.MessageReceived += KeyboardHook_MessageReceived;
-                //_keyboardHook.AddHandler(KeyCode.Y, KeyboardHook_Test);
+                _keyboardHook.AddHandler(KeyCode.F, KeyboardHook_Test);
+                _keyboardHook.AddHandler(KeyCode.F, Modifiers.Shift, KeyboardHook_Test);
                 _keyboardHook.AddHandler(KeyCode.Y, Modifiers.ControlShift, KeyboardHook_Test);
                 _keyboardHook.AddHandler(KeyCode.U, Modifiers.Shift | Modifiers.RightControl, KeyboardHook_Test);
                 _keyboardHook.AddHandler(KeyCode.N, Modifiers.AltControlShift, KeyboardHook_Test);

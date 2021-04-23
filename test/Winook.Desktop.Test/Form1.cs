@@ -68,7 +68,8 @@
         {
             testLabel.Invoke((MethodInvoker)delegate
             {
-                testLabel.Text = $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}; XButtons: {e.XButtons}";
+                testLabel.Text = $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; "
+                    + $"Modifiers: {e.Modifiers:x}; Delta: {e.Delta}; XButtons: {e.XButtons}";
             });
         }
 
@@ -76,7 +77,8 @@
         {
             mouseLabel.Invoke((MethodInvoker)delegate
             {
-                mouseLabel.Text = $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}; XButtons: {e.XButtons}";
+                mouseLabel.Text = $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; "
+                    + $"Modifiers: {e.Modifiers:x}; Delta: {e.Delta}; XButtons: {e.XButtons}";
             });
         }
 
@@ -84,7 +86,8 @@
         {
             testLabel.Invoke((MethodInvoker)delegate
             {
-                testLabel.Text = $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Delta: {e.Delta}; XButtons: {e.XButtons}";
+                testLabel.Text = $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; "
+                    + $"Modifiers: {e.Modifiers:x}; Delta: {e.Delta}; XButtons: {e.XButtons}";
             });
         }
 
@@ -106,7 +109,8 @@
 
                 _keyboardHook = new KeyboardHook(_process.Id);
                 _keyboardHook.MessageReceived += KeyboardHook_MessageReceived;
-                //_keyboardHook.AddHandler(KeyCode.Y, KeyboardHook_Test);
+                _keyboardHook.AddHandler(KeyCode.F, KeyboardHook_Test);
+                _keyboardHook.AddHandler(KeyCode.F, Modifiers.Shift, KeyboardHook_Test);
                 _keyboardHook.AddHandler(KeyCode.Y, Modifiers.ControlShift, KeyboardHook_Test);
                 _keyboardHook.AddHandler(KeyCode.U, Modifiers.Shift | Modifiers.RightControl, KeyboardHook_Test);
                 _keyboardHook.AddHandler(KeyCode.N, Modifiers.AltControlShift, KeyboardHook_Test);

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.0 (2021-04-11)
+
+### Added
+
+- #26: Add Shift, Control, Alt state to mouse messages
+
 ## 1.2.1 (2021-04-15)
 
 ### Fixed
