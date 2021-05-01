@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Diagnostics.Contracts;
+    using System.Linq;
 
     public class KeyboardHook : HookBase
     {
@@ -38,20 +39,20 @@
         #region Methods
 
         public void AddHandler(KeyCode keyCode, KeyboardEventHandler handler)
-            => AddHandler((ushort)keyCode, KeyDirection.Up, Modifiers.None, handler);
+            => AddHandler((ushort)keyCode, Modifiers.None, KeyDirection.Up, handler);
 
         public void AddHandler(ushort keyValue, KeyboardEventHandler handler)
-            => AddHandler(keyValue, KeyDirection.Up, Modifiers.None, handler);
+            => AddHandler(keyValue, Modifiers.None, KeyDirection.Up, handler);
 
         public void AddHandler(KeyCode keyCode, Modifiers modifiers, KeyboardEventHandler handler)
-            => AddHandler((ushort)keyCode, KeyDirection.Up, modifiers, handler);
+            => AddHandler((ushort)keyCode, modifiers, KeyDirection.Up, handler);
         public void AddHandler(ushort keyValue, Modifiers modifiers, KeyboardEventHandler handler)
-            => AddHandler(keyValue, KeyDirection.Up, modifiers, handler);
+            => AddHandler(keyValue, modifiers, KeyDirection.Up, handler);
 
-        public void AddHandler(KeyCode keyCode, KeyDirection direction, Modifiers modifiers, KeyboardEventHandler handler)
-            => AddHandler((ushort)keyCode, direction, modifiers, handler);
+        public void AddHandler(KeyCode keyCode, Modifiers modifiers, KeyDirection direction, KeyboardEventHandler handler)
+            => AddHandler((ushort)keyCode, modifiers, direction, handler);
 
-        public void AddHandler(ushort keyValue, KeyDirection direction, Modifiers modifiers, KeyboardEventHandler handler)
+        public void AddHandler(ushort keyValue, Modifiers modifiers, KeyDirection direction, KeyboardEventHandler handler)
         {
             foreach (var key in GetHandlerKeys(keyValue, modifiers, direction))
             {
@@ -60,10 +61,16 @@
         }
 
         public void RemoveHandler(KeyCode keyCode, KeyboardEventHandler handler)
-            => RemoveHandler((ushort)keyCode, Modifiers.None, KeyDirection.Up, handler);
+            => RemoveHandler((ushort)keyCode, Modifiers.None, KeyDirection.Any, handler);
 
         public void RemoveHandler(ushort keyValue, KeyboardEventHandler handler)
-            => RemoveHandler(keyValue, Modifiers.None, KeyDirection.Up, handler);
+            => RemoveHandler(keyValue, Modifiers.None, KeyDirection.Any, handler);
+
+        public void RemoveHandler(KeyCode keyCode, Modifiers modifiers, KeyboardEventHandler handler)
+            => RemoveHandler((ushort)keyCode, modifiers, KeyDirection.Any, handler);
+
+        public void RemoveHandler(ushort keyValue, Modifiers modifiers, KeyboardEventHandler handler)
+            => RemoveHandler(keyValue, modifiers, KeyDirection.Any, handler);
 
         public void RemoveHandler(KeyCode keyCode, Modifiers modifiers, KeyDirection direction, KeyboardEventHandler handler)
             => RemoveHandler((ushort)keyCode, modifiers, direction, handler);
@@ -117,7 +124,7 @@
             if (disposing)
             {
                 MessageReceived = null;
-                foreach (var key in _messageHandlers.Keys)
+                foreach (var key in _messageHandlers.Keys.ToArray())
                 {
                     _messageHandlers[key] = null;
                 }
