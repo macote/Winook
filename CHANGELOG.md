@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.1 (2021-04-30)
+
+### Fixed
+
+- #28: Fix Dispose() issue
+
 ## 1.3.0 (2021-04-11)
 
 ### Added
