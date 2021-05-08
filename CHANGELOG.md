@@ -1,10 +1,20 @@
 # Changelog
 
+## 1.3.2 (2021-05-08)
+
+### Fixed
+
+- #31: Fix Dispose() issue in MouseHook
+
+### Added
+
+- #30: Add RemoveAllHandlers()
+
 ## 1.3.1 (2021-04-30)
 
 ### Fixed
 
-- #28: Fix Dispose() issue
+- #28: Fix Dispose() issue in KeyboardHook
 
 ## 1.3.0 (2021-04-23)
 
