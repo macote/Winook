@@ -41,13 +41,22 @@ namespace Winook.Desktop.Core.Test
                     }
                 }
 
-                if (ignoreMove.IsChecked ?? false)
+                if (_mouseHook == null)
                 {
-                    _mouseHook = new MouseHook(_process.Id, MouseMessageTypes.IgnoreMove);
+                    if (ignoreMove.IsChecked ?? false)
+                    {
+                        _mouseHook = new MouseHook(_process.Id, MouseMessageTypes.IgnoreMove);
+                    }
+                    else
+                    {
+                        _mouseHook = new MouseHook(_process.Id);
+                    }
+
+                    ignoreMove.IsEnabled = false;
                 }
                 else
                 {
-                    _mouseHook = new MouseHook(_process.Id);
+                    _mouseHook.RemoveAllHandlers();
                 }
 
                 _mouseHook.MessageReceived += MouseHook_MessageReceived;
@@ -110,7 +119,15 @@ namespace Winook.Desktop.Core.Test
                     }
                 }
 
-                _keyboardHook = new KeyboardHook(_process.Id);
+                if (_keyboardHook == null)
+                {
+                    _keyboardHook = new KeyboardHook(_process.Id);
+                }
+                else
+                {
+                    _keyboardHook.RemoveAllHandlers();
+                }
+
                 _keyboardHook.MessageReceived += KeyboardHook_MessageReceived;
                 _keyboardHook.AddHandler(KeyCode.F, KeyboardHook_Test);
                 _keyboardHook.AddHandler(KeyCode.F, Modifiers.Shift, KeyboardHook_Test);

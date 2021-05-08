@@ -83,6 +83,15 @@
             }
         }
 
+        public void RemoveAllHandlers()
+        {
+            MessageReceived = null;
+            foreach (var key in _messageHandlers.Keys.ToArray())
+            {
+                _messageHandlers[key] = null;
+            }
+        }
+
         protected override void OnMessageReceived(object sender, MessageEventArgs e)
         {
             Contract.Requires(e != null);
@@ -123,11 +132,7 @@
 
             if (disposing)
             {
-                MessageReceived = null;
-                foreach (var key in _messageHandlers.Keys.ToArray())
-                {
-                    _messageHandlers[key] = null;
-                }
+                RemoveAllHandlers();
             }
 
             _disposed = true;
