@@ -5,6 +5,7 @@
     using System.Diagnostics;
     using System.Diagnostics.Contracts;
     using System.Globalization;
+    using System.Linq;
 
     public class MouseHook : HookBase
     {
@@ -87,6 +88,30 @@
             if (_messageHandlers.ContainsKey(mouseMessageCode))
             {
                 _messageHandlers[mouseMessageCode] -= handler ?? throw new ArgumentNullException(nameof(handler));
+            }
+        }
+
+        public void RemoveAllHandlers()
+        {
+            MessageReceived = null;
+            MouseMove = null;
+            LeftButtonDown = null;
+            LeftButtonUp = null;
+            LeftButtonDblClk = null;
+            RightButtonDown = null;
+            RightButtonUp = null;
+            RightButtonDblClk = null;
+            MiddleButtonDown = null;
+            MiddleButtonUp = null;
+            MiddleButtonDblClk = null;
+            MouseWheel = null;
+            XButtonDown = null;
+            XButtonUp = null;
+            XButtonDblClk = null;
+            MouseHWheel = null;
+            foreach (var key in _messageHandlers.Keys.ToArray())
+            {
+                _messageHandlers[key] = null;
             }
         }
 
@@ -194,26 +219,7 @@
 
             if (disposing)
             {
-                MessageReceived = null;
-                MouseMove = null;
-                LeftButtonDown = null;
-                LeftButtonUp = null;
-                LeftButtonDblClk = null;
-                RightButtonDown = null;
-                RightButtonUp = null;
-                RightButtonDblClk = null;
-                MiddleButtonDown = null;
-                MiddleButtonUp = null;
-                MiddleButtonDblClk = null;
-                MouseWheel = null;
-                XButtonDown = null;
-                XButtonUp = null;
-                XButtonDblClk = null;
-                MouseHWheel = null;
-                foreach (var key in _messageHandlers.Keys)
-                {
-                    _messageHandlers[key] = null;
-                }
+                RemoveAllHandlers();
             }
 
             _disposed = true;
