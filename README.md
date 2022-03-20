@@ -1,4 +1,4 @@
-![](doc/Winook_readme.png)
+![](doc/Winook.svg)
 
 [![nuget][nuget-badge]][nuget-url]
 
