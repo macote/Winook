@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Windows;
 using Winook;
 
@@ -166,6 +167,11 @@ namespace Winook.Desktop.Core.Test
                 testLabel.Content = $"Code: {e.KeyValue}; Modifiers: {e.Modifiers}; Flags: {e.Flags:x} "
                     + $"Shift: {e.Shift}; Control: {e.Control}; Alt: {e.Alt}; Direction: {e.Direction}";
             }));
+        }
+
+        private async void Button_Click(object sender, RoutedEventArgs e)
+        {
+            await Task.Run(() => { _keyboardHook.RemoveAllHandlers(); _keyboardHook.Uninstall(); }).ConfigureAwait(false);
         }
     }
 }

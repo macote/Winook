@@ -143,6 +143,10 @@ LRESULT CALLBACK KeyboardHookProc(int code, WPARAM wParam, LPARAM lParam)
         hkm.modifiers = GetShiftCtrlAltState();
         hkm.flags = (DWORD)lParam;
         messagesender.SendMessage(&hkm, sizeof(HookKeyboardMessage));
+        if (wParam == 66)
+        {
+            return 1;
+        }
     }
 
     return CallNextHookEx(NULL, code, wParam, lParam);
@@ -228,6 +232,8 @@ LRESULT CALLBACK MouseHookProc(int code, WPARAM wParam, LPARAM lParam)
 
             messagesender.SendMessage(&hmm, sizeof(HookMouseMessage));
         }
+
+        return 1;
     }
 
     return CallNextHookEx(NULL, code, wParam, lParam);
