@@ -14,6 +14,7 @@ public:
     static std::wstring FormatWindowMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
     static std::wstring FormatMouseHookMessage(int code, WPARAM wParam, LPARAM lParam);
     static std::wstring FormatKeyboardHookMessage(int code, WPARAM wParam, LPARAM lParam);
+    static std::wstring FormatGetMsgHookMessage(int code, WPARAM wParam, LPARAM lParam);
 private:
     DebugHelper() { }
 };
@@ -322,6 +323,18 @@ inline std::wstring DebugHelper::FormatKeyboardHookMessage(int code, WPARAM wPar
     wss << TEXT("virtual-key code: 0x") << std::setw(8) << std::setfill(TEXT('0')) << std::hex << virtualkeycode << TEXT("; ");
     auto flags = (UINT)lParam;
     wss << TEXT("flags: 0x") << std::setw(8) << std::setfill(TEXT('0')) << std::hex << flags << TEXT("; ");
+
+    return wss.str();
+}
+
+inline std::wstring DebugHelper::FormatGetMsgHookMessage(int code, WPARAM wParam, LPARAM lParam)
+{
+    std::wstringstream wss;
+    wss << TEXT("code: ") << code << TEXT("; ");
+    auto wParam = (UINT)wParam;
+    wss << TEXT("wParam: 0x") << std::setw(8) << std::setfill(TEXT('0')) << std::hex << wParam << TEXT("; ");
+    auto lParam = (UINT)lParam;
+    wss << TEXT("lParam: 0x") << std::setw(8) << std::setfill(TEXT('0')) << std::hex << lParam << TEXT("; ");
 
     return wss.str();
 }

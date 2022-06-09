@@ -36,6 +36,16 @@ struct HookKeyboardMessage
     DWORD flags;
 };
 
+struct HookMsgMessage {
+    WPARAM removed;
+    HWND hwnd;
+    UINT message;
+    WPARAM wParam;
+    LPARAM lParam;
+    DWORD time;
+    POINT pt;
+};
+
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved);
 
 BOOL Initialize(HINSTANCE hinst);
@@ -50,3 +60,5 @@ void LogDllMain(HINSTANCE hinst, std::wstring reason);
 extern "C" __declspec(dllexport) LRESULT CALLBACK KeyboardHookProc(int code, WPARAM wParam, LPARAM lParam);
 
 extern "C" __declspec(dllexport) LRESULT CALLBACK MouseHookProc(int code, WPARAM wParam, LPARAM lParam);
+
+extern "C" __declspec(dllexport) LRESULT CALLBACK GetMsgHookProc(int code, WPARAM wParam, LPARAM lParam);

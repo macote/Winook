@@ -86,6 +86,10 @@ BOOL Initialize(HINSTANCE hinst)
     {
         hooktype = WH_MOUSE;
     }
+    else if (StrStrI(dllfilepath, kGetMsgHookLibName.c_str()) != NULL)
+    {
+        hooktype = WH_GETMESSAGE;
+    }
     else
     {
         return FALSE; // Unsupported hook type
@@ -228,6 +232,28 @@ LRESULT CALLBACK MouseHookProc(int code, WPARAM wParam, LPARAM lParam)
 
             messagesender.SendMessage(&hmm, sizeof(HookMouseMessage));
         }
+    }
+
+    return CallNextHookEx(NULL, code, wParam, lParam);
+}
+
+LRESULT CALLBACK GetMsgHookProc(int code, WPARAM wParam, LPARAM lParam)
+{
+#if _DEBUG
+    LogDll(DebugHelper::FormatGetMsgHookMessage(code, wParam, lParam));
+#endif
+    if (code == HC_ACTION)
+    {
+        HookMsgMessage hmm{};
+        hmm.removed = (WORD)wParam;
+        auto pmsg = (PMSG)lParam;
+        hmm.hwnd = pmsg->hwnd;
+        hmm.message = pmsg->message;
+        hmm.wParam = pmsg->wParam;
+        hmm.lParam = pmsg->lParam;
+        hmm.time = pmsg->time;
+        hmm.pt = pmsg->pt;
+        messagesender.SendMessage(&hmm, sizeof(HookMsgMessage));
     }
 
     return CallNextHookEx(NULL, code, wParam, lParam);

@@ -2,3 +2,4 @@ LIBRARY
 EXPORTS
     KeyboardHookProc @1
     MouseHookProc @2
+    GetMsgHookProc @3

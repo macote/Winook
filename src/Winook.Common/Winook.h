@@ -19,13 +19,16 @@ constexpr auto kPathBufferSize = 1024;
 #if defined(WINOOK64)
 const std::wstring kKeyboardHookLibName = std::wstring(TEXT("Winook.Lib.Keyboard.x64.dll"));
 const std::wstring kMouseHookLibName = std::wstring(TEXT("Winook.Lib.Mouse.x64.dll"));
+const std::wstring kGetMsgHookLibName = std::wstring(TEXT("Winook.Lib.Msg.x64.dll"));
 #else
 const std::wstring kKeyboardHookLibName = std::wstring(TEXT("Winook.Lib.Keyboard.x86.dll"));
 const std::wstring kMouseHookLibName = std::wstring(TEXT("Winook.Lib.Mouse.x86.dll"));
+const std::wstring kGetMsgHookLibName = std::wstring(TEXT("Winook.Lib.Msg.x86.dll"));
 #endif
 
 const std::string kKeyboardHookProcName = std::string("KeyboardHookProc");
 const std::string kMouseHookProcName = std::string("MouseHookProc");
+const std::string kGetMsgHookProcName = std::string("GetMsgHookProc");
 
 #define LOGWINOOK 1
 #if _DEBUG && LOGWINOOK
