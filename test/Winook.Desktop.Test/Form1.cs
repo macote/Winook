@@ -2,6 +2,7 @@
 {
     using System;
     using System.Diagnostics;
+    using System.Threading.Tasks;
     using System.Windows.Forms;
     using Winook;
 
@@ -37,6 +38,8 @@
                         _process = Process.Start(@"c:\windows\notepad.exe");
                     }
                 }
+
+                await Task.Delay(1000); // wait a bit for app to show its window
 
                 if (ignoreMove.Checked)
                 {
@@ -106,6 +109,8 @@
                         _process = Process.Start(@"c:\windows\notepad.exe");
                     }
                 }
+
+                await Task.Delay(1000); // wait a bit for app to show its window
 
                 _keyboardHook = new KeyboardHook(_process.Id);
                 _keyboardHook.MessageReceived += KeyboardHook_MessageReceived;

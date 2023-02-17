@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Windows;
 using Winook;
 
@@ -40,6 +41,8 @@ namespace Winook.Desktop.Core.Test
                         _process = Process.Start(@"c:\windows\notepad.exe");
                     }
                 }
+
+                await Task.Delay(1000); // wait a bit for app to show its window
 
                 if (_mouseHook == null)
                 {
@@ -118,6 +121,8 @@ namespace Winook.Desktop.Core.Test
                         _process = Process.Start(@"c:\windows\notepad.exe");
                     }
                 }
+
+                await Task.Delay(1000); // wait a bit for app to show its window
 
                 if (_keyboardHook == null)
                 {
