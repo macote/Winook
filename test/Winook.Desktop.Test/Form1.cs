@@ -1,7 +1,8 @@
-﻿namespace Winook.Desktop.Test
+namespace Winook.Desktop.Test
 {
     using System;
     using System.Diagnostics;
+    using System.Linq;
     using System.Threading.Tasks;
     using System.Windows.Forms;
     using Winook;
@@ -27,19 +28,7 @@
         {
             if (!_mouseHookInstalled)
             {
-                if (_process == null || _process.HasExited)
-                {
-                    if (Environment.Is64BitOperatingSystem && radio32bit.Checked)
-                    {
-                        _process = Process.Start(@"c:\windows\syswow64\notepad.exe");
-                    }
-                    else
-                    {
-                        _process = Process.Start(@"c:\windows\notepad.exe");
-                    }
-                }
-
-                await Task.Delay(1000); // wait a bit for app to show its window
+                await EnsureTargetProcessAsync();
 
                 if (ignoreMove.Checked)
                 {
@@ -98,19 +87,7 @@
         {
             if (!_keyboardHookInstalled)
             {
-                if (_process == null || _process.HasExited)
-                {
-                    if (Environment.Is64BitOperatingSystem && radio32bit.Checked)
-                    {
-                        _process = Process.Start(@"c:\windows\syswow64\notepad.exe");
-                    }
-                    else
-                    {
-                        _process = Process.Start(@"c:\windows\notepad.exe");
-                    }
-                }
-
-                await Task.Delay(1000); // wait a bit for app to show its window
+                await EnsureTargetProcessAsync();
 
                 _keyboardHook = new KeyboardHook(_process.Id);
                 _keyboardHook.MessageReceived += KeyboardHook_MessageReceived;
@@ -151,6 +128,84 @@
                 testLabel.Text = $"Code: {e.KeyValue}; Modifiers: {e.Modifiers}; Flags: {e.Flags:x} "
                     + $"Shift: {e.Shift}; Control: {e.Control}; Alt: {e.Alt}; Direction: {e.Direction}";
             });
+        }
+
+        private async Task EnsureTargetProcessAsync()
+        {
+            if (_process != null && !_process.HasExited)
+            {
+                return;
+            }
+
+            var existingCharacterMapProcessIds = Process.GetProcessesByName("charmap")
+                .Select(process => process.Id)
+                .ToArray();
+
+            var characterMapPath = Environment.Is64BitOperatingSystem && radio32bit.Checked
+                ? @"c:\windows\syswow64\charmap.exe"
+                : @"c:\windows\system32\charmap.exe";
+
+            var startedProcess = Process.Start(characterMapPath);
+            _process = startedProcess;
+
+            await Task.Delay(1000);
+
+            if (HasMainWindow(startedProcess))
+            {
+                return;
+            }
+
+            var replacementProcess = Process.GetProcessesByName("charmap")
+                .Where(process => !existingCharacterMapProcessIds.Contains(process.Id))
+                .Where(HasMainWindow)
+                .OrderByDescending(GetStartTime)
+                .FirstOrDefault()
+                ?? Process.GetProcessesByName("charmap")
+                    .Where(HasMainWindow)
+                    .OrderByDescending(GetStartTime)
+                    .FirstOrDefault();
+
+            if (replacementProcess == null)
+            {
+                throw new InvalidOperationException("Unable to find the Character Map process window to hook.");
+            }
+
+            if (startedProcess != replacementProcess)
+            {
+                startedProcess?.Dispose();
+            }
+
+            _process = replacementProcess;
+        }
+
+        private static bool HasMainWindow(Process process)
+        {
+            if (process == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                process.Refresh();
+                return !process.HasExited && process.MainWindowHandle != IntPtr.Zero;
+            }
+            catch (InvalidOperationException)
+            {
+                return false;
+            }
+        }
+
+        private static DateTime GetStartTime(Process process)
+        {
+            try
+            {
+                return process.StartTime;
+            }
+            catch (InvalidOperationException)
+            {
+                return DateTime.MinValue;
+            }
         }
     }
 }
