@@ -16,7 +16,7 @@
 
         private readonly Dictionary<int, MouseEventHandler> _messageHandlers = new Dictionary<int, MouseEventHandler>();
 
-        private bool _disposed = false;
+        private bool _disposed;
 
         #endregion
 
@@ -199,8 +199,6 @@
                     break;
                 case MouseMessageCode.MouseHWheel:
                     MouseHWheel?.Invoke(this, eventArgs);
-                    break;
-                default:
                     break;
             }
 

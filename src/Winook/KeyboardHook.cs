@@ -15,7 +15,7 @@
 
         private readonly Dictionary<uint, KeyboardEventHandler> _messageHandlers = new Dictionary<uint, KeyboardEventHandler>();
 
-        private bool _disposed = false;
+        private bool _disposed;
 
         #endregion
 

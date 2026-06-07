@@ -28,7 +28,7 @@
         private Process _libHostProcess;
         private Process _libHostProcess64;
         private ManualResetEventSlim _libHostMutexReleaseEvent;
-        private bool _disposed = false;
+        private bool _disposed;
 
         #endregion
 
@@ -61,7 +61,7 @@
                           acquireEvent.Set();
                           _libHostMutexReleaseEvent.Wait();
                           mutex.ReleaseMutex(); // Let host process unhook and terminate
-                    }
+                      }
                   });
                 acquireEvent.Wait();
             }

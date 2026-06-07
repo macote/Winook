@@ -77,7 +77,7 @@ BOOL Initialize(HINSTANCE hinst)
 
     TCHAR dllfilepath[kPathBufferSize];
     GetModuleFileName(module, dllfilepath, kPathBufferSize);
-    int hooktype{};
+    int hooktype;
     if (StrStrI(dllfilepath, kKeyboardHookLibName.c_str()) != NULL)
     {
         hooktype = WH_KEYBOARD;

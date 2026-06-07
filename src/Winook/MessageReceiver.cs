@@ -18,7 +18,7 @@
         private Task _listeningTask;
         private ManualResetEventSlim _portSetEvent;
 
-        private bool _disposed = false;
+        private bool _disposed;
 
         #endregion
 
