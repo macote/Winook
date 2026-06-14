@@ -1,4 +1,4 @@
-﻿namespace Winook
+namespace Winook
 {
     using System;
     using System.Collections.Generic;
@@ -10,7 +10,7 @@
     {
         #region Fields
 
-        private const int HookMessageSizeInBytes = 8;
+        private const int HookMessageSizeInBytes = 16;
         private const HookType KeyboardHookType = HookType.Keyboard; // WH_KEYBOARD
 
         private readonly Dictionary<uint, KeyboardEventHandler> _messageHandlers = new Dictionary<uint, KeyboardEventHandler>();
@@ -109,6 +109,7 @@
                 Control = (modifiers & 0b10) > 0,
                 Alt = (modifiers & 0b1) > 0,
                 Direction = pressed ? KeyDirection.Down : KeyDirection.Up,
+                SendTimestamp = DateTimeOffset.FromFileTime((long)BitConverter.ToUInt64(e.Bytes, 8)),
             };
 
             Debug.Write($"Code: {eventArgs.KeyValue}; Modifiers: {eventArgs.Modifiers:x}; Flags: {eventArgs.Flags:x}; ");

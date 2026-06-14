@@ -1,4 +1,4 @@
-﻿namespace Winook
+namespace Winook
 {
     /// <summary>
     /// Key code enum derived from System.Windows.Forms.Keys.

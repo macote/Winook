@@ -27,6 +27,8 @@ struct HookMouseMessage
     DWORD hitTestCode;
     DWORD extra;
     DWORD modifiers;
+    DWORD _pad;
+    ULONGLONG timestamp;
 };
 
 struct HookKeyboardMessage
@@ -34,6 +36,7 @@ struct HookKeyboardMessage
     WORD keyCode;
     WORD modifiers;
     DWORD flags;
+    ULONGLONG timestamp;
 };
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved);

@@ -21,8 +21,7 @@
 TimestampLogger Logger = TimestampLogger(LOGWINOOKLIBPATH + TimestampLogger::GetTimestampString(TRUE) + TEXT(".log"), TRUE);
 #endif
 
-asio::io_context io_context;
-MessageSender messagesender(io_context); 
+MessageSender messagesender;
 WORD mousemessagetypes;
 
 BOOL WINAPI DllMain(HINSTANCE hinst, DWORD fdwReason, LPVOID lpReserved)
@@ -56,6 +55,7 @@ BOOL WINAPI DllMain(HINSTANCE hinst, DWORD fdwReason, LPVOID lpReserved)
 #if _DEBUG
         LogDllMain(hinst, TEXT("DLL_PROCESS_DETACH"));
 #endif
+        messagesender.Stop(false);
         break;
     }
 
@@ -98,8 +98,8 @@ BOOL Initialize(HINSTANCE hinst)
     }
 
     std::ifstream configfile(configfilepath.c_str());
-    std::string port;
-    configfile >> port;
+    std::string pipeName;
+    configfile >> pipeName;
     if (hooktype == WH_MOUSE)
     {
         configfile >> mousemessagetypes;
@@ -107,7 +107,7 @@ BOOL Initialize(HINSTANCE hinst)
 
     configfile.close();
     DeleteFile(configfilepath.c_str());
-    messagesender.Connect(port);
+    messagesender.Connect(std::wstring(pipeName.begin(), pipeName.end()));
 
     return TRUE;
 }
@@ -138,10 +138,13 @@ LRESULT CALLBACK KeyboardHookProc(int code, WPARAM wParam, LPARAM lParam)
 #endif
     if (code == HC_ACTION)
     {
+        FILETIME ft{};
+        GetSystemTimeAsFileTime(&ft);
         HookKeyboardMessage hkm{};
         hkm.keyCode = (WORD)wParam;
         hkm.modifiers = GetShiftCtrlAltState();
         hkm.flags = (DWORD)lParam;
+        hkm.timestamp = (static_cast<ULONGLONG>(ft.dwHighDateTime) << 32) | ft.dwLowDateTime;
         messagesender.SendMessage(&hkm, sizeof(HookKeyboardMessage));
     }
 
@@ -199,6 +202,8 @@ LRESULT CALLBACK MouseHookProc(int code, WPARAM wParam, LPARAM lParam)
 #endif
         if (mousemessagetypes == 0 || (mousemessagetypes & messagetype) > 0)
         {
+            FILETIME ft{};
+            GetSystemTimeAsFileTime(&ft);
             HookMouseMessage hmm{};
             hmm.messageCode = messagecode;
             hmm.modifiers = GetShiftCtrlAltState();
@@ -226,7 +231,8 @@ LRESULT CALLBACK MouseHookProc(int code, WPARAM wParam, LPARAM lParam)
                 hmm.hitTestCode = (DWORD)pmhs->wHitTestCode;
             }
 
-            messagesender.SendMessage(&hmm, sizeof(HookMouseMessage));
+            hmm.timestamp = (static_cast<ULONGLONG>(ft.dwHighDateTime) << 32) | ft.dwLowDateTime;
+            messagesender.SendMessage(&hmm, sizeof(HookMouseMessage), messagecode == WM_MOUSEMOVE);
         }
     }
 

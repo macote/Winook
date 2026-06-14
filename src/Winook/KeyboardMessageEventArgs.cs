@@ -1,4 +1,4 @@
-﻿namespace Winook
+namespace Winook
 {
     using System;
 
@@ -12,6 +12,7 @@
         public bool Control;
         public bool Alt;
         public KeyDirection Direction;
+        public DateTimeOffset SendTimestamp;
     }
 #pragma warning restore CA1051 // Do not declare visible instance fields
 }

@@ -1,4 +1,4 @@
-﻿namespace Winook
+namespace Winook
 {
     using System;
     using System.Collections.Generic;
@@ -11,7 +11,7 @@
     {
         #region Fields
 
-        private const int HookMessageSizeInBytes = 28;
+        private const int HookMessageSizeInBytes = 40;
         private const HookType MouseHookType = HookType.Mouse; // WH_MOUSE
 
         private readonly Dictionary<int, MouseEventHandler> _messageHandlers = new Dictionary<int, MouseEventHandler>();
@@ -131,6 +131,7 @@
                 Shift = (modifiers & 0b100) > 0,
                 Control = (modifiers & 0b10) > 0,
                 Alt = (modifiers & 0b1) > 0,
+                SendTimestamp = DateTimeOffset.FromFileTime((long)BitConverter.ToUInt64(e.Bytes, 32)),
             };
 
             var messageCode = GetMessageCode(eventArgs.MessageCode);

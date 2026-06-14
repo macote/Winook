@@ -1,22 +1,22 @@
-﻿namespace Winook
+namespace Winook
 {
     using System;
-    using System.Net;
-    using System.Net.Sockets;
+    using System.IO;
+    using System.IO.Pipes;
     using System.Threading;
     using System.Threading.Tasks;
 
-    public class MessageReceiver : IDisposable
+    internal class MessageReceiver : IDisposable
     {
         #region Fields
 
         private readonly int _messageByteSize;
+        private readonly string _pipeName;
 
-        private TcpListener _tcpListener;
+        private NamedPipeServerStream _pipeServerStream;
         private CancellationTokenSource _cancellationTokenSource;
         private CancellationToken _cancellationToken;
         private Task _listeningTask;
-        private ManualResetEventSlim _portSetEvent;
 
         private bool _disposed;
 
@@ -24,9 +24,10 @@
 
         #region Constructors
 
-        public MessageReceiver(int messageByteSize)
+        public MessageReceiver(int messageByteSize, string pipeName)
         {
             _messageByteSize = messageByteSize;
+            _pipeName = pipeName;
         }
 
         #endregion
@@ -39,7 +40,7 @@
 
         #region Properties
 
-        public int Port { get; private set; }
+        public string PipeName => _pipeName;
 
         public bool IsListening => _listeningTask != null && !_listeningTask.IsCompleted;
 
@@ -51,74 +52,57 @@
         {
             _cancellationTokenSource = new CancellationTokenSource();
             _cancellationToken = _cancellationTokenSource.Token;
-            _portSetEvent = new ManualResetEventSlim(false);
+            _pipeServerStream = new NamedPipeServerStream(
+                _pipeName,
+                PipeDirection.In,
+                1,
+                PipeTransmissionMode.Byte,
+                PipeOptions.Asynchronous);
+
             _listeningTask = Task.Run(() =>
             {
-                _tcpListener = new TcpListener(IPAddress.Loopback, 0);
-                _tcpListener.Start(1);
-                Port = ((IPEndPoint)_tcpListener.LocalEndpoint).Port;
-                _portSetEvent.Set();
-
                 try
                 {
-                    var bytes = new byte[_messageByteSize];
-                    using (var client = _tcpListener.AcceptTcpClient())
-                    {
-                        using (var stream = client.GetStream())
-                        {
-                            int bytecount, offset = 0;
-                            while ((bytecount = stream.Read(bytes, offset, bytes.Length - offset)) != 0)
-                            {
-                                if (bytecount + offset == _messageByteSize)
-                                {
-                                    offset = 0;
-                                    MessageReceived(this, new MessageEventArgs { Bytes = bytes });
-                                }
-                                else
-                                {
-                                    offset = bytecount;
-                                }
+                    _pipeServerStream.WaitForConnection();
 
-                                if (_cancellationToken.IsCancellationRequested)
-                                {
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-                catch (System.IO.IOException exception)
-                {
-                    if (exception.InnerException is SocketException socketException)
+                    var bytes = new byte[_messageByteSize];
+                    int bytecount, offset = 0;
+                    while ((bytecount = _pipeServerStream.Read(bytes, offset, bytes.Length - offset)) != 0)
                     {
-                        // Connection gets reset when the hooked client terminates
-                        if (socketException.SocketErrorCode != SocketError.ConnectionReset)
+                        offset += bytecount;
+                        if (offset == _messageByteSize)
                         {
-                            throw;
+                            offset = 0;
+                            var messageBytes = new byte[_messageByteSize];
+                            Buffer.BlockCopy(bytes, 0, messageBytes, 0, _messageByteSize);
+                            MessageReceived(this, new MessageEventArgs { Bytes = messageBytes });
+                        }
+
+                        if (_cancellationToken.IsCancellationRequested)
+                        {
+                            break;
                         }
                     }
                 }
-                catch (SocketException exception)
+                catch (IOException)
                 {
-                    if (exception.ErrorCode != 10004) // WSACancelBlockingCall
-                    {
-                        throw;
-                    }
+                    // The pipe is closed when the hook is uninstalled or the hooked process exits.
+                }
+                catch (ObjectDisposedException)
+                {
+                    // Stop() closes the pipe to unblock WaitForConnection() or Read().
                 }
             });
-            _portSetEvent.Wait();
         }
 
         public void Stop()
         {
-            if (_tcpListener != null)
+            if (_pipeServerStream != null)
             {
                 _cancellationTokenSource.Cancel();
-                _tcpListener.Stop();
-                _portSetEvent.Reset();
+                _pipeServerStream.Dispose();
+                _pipeServerStream = null;
             }
-
-            Port = 0;
         }
 
         public void Dispose()
@@ -140,7 +124,6 @@
                     }
 
                     _listeningTask?.Dispose();
-                    _portSetEvent?.Dispose();
                     _cancellationTokenSource?.Dispose();
                 }
 
