@@ -1,4 +1,4 @@
-﻿namespace Winook
+namespace Winook
 {
     using System;
     using System.Collections.Generic;
@@ -14,6 +14,7 @@
         #region Fields
 
         private const string LibHostBaseName = "winook.support\\Winook.Lib.Host";
+        private const string PipeNamePrefix = "Winook.";
         private const int InitializationTimeout1InMilliseconds = 222;
         private const int InitializationTimeout2InMilliseconds = 1111;
         private const int InitializationTimeout3InMilliseconds = 3333;
@@ -38,7 +39,7 @@
         {
             _processId = processId;
             _hookType = hookType;
-            _messageReceiver = new MessageReceiver(messageSizeInBytes);
+            _messageReceiver = new MessageReceiver(messageSizeInBytes, $"{PipeNamePrefix}{_libHostMutexGuid:N}");
             _messageReceiver.MessageReceived += OnMessageReceived;
         }
 
@@ -151,7 +152,7 @@
             =>_additionalHostArguments.AddRange(arguments);
 
         private string GetBaseHostArguments()
-            => $"{(int)_hookType} {_messageReceiver.Port} {_processId} {_libHostMutexGuid}";
+            => $"{(int)_hookType} {_messageReceiver.PipeName} {_processId} {_libHostMutexGuid}";
 
         private string GetHostArguments()
             => GetBaseHostArguments() + " " + string.Join(" ", _additionalHostArguments);

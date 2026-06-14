@@ -1,5 +1,8 @@
-﻿using System;
+using System;
+using System.Runtime.Versioning;
 using System.Windows.Forms;
+
+[assembly: SupportedOSPlatform("windows7.0")]
 
 namespace Winook.Desktop.Test
 {

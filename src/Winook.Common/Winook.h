@@ -212,8 +212,6 @@ inline void Winook::WaitForProcess()
 {
     // Ensure target process' main window is ready
     const auto waitresult = WaitForInputIdle(process_, kProcessWaitForInputIdleTimeoutIntervalInMilliseconds);
-    CloseHandle(process_);
-    process_ = NULL;
 
     if (waitresult == WAIT_FAILED)
     {
@@ -367,11 +365,13 @@ inline void Winook::CleanUp()
         }
 
         CloseHandle(process_);
+        process_ = NULL;
     }
 
     if (mutex_ != NULL)
     {
         CloseHandle(mutex_);
+        mutex_ = NULL;
     }
 
     if (hook_ != NULL && exitCode == STILL_ACTIVE)
@@ -380,5 +380,7 @@ inline void Winook::CleanUp()
         {
             HandleError("UnhookWindowsHookEx() failed", GetLastError());
         }
+
+        hook_ = NULL;
     }
 }

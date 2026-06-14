@@ -1,4 +1,4 @@
-﻿namespace Winook
+namespace Winook
 {
     public enum HookType
     {

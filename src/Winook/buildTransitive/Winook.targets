@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Condition="'$(WinookSupportBinariesImported)' == ''">
+    <WinookSupportBinary Include="$(MSBuildThisFileDirectory)..\runtimes\win-x86\native\Winook.Lib.Host.x86.exe" />
+    <WinookSupportBinary Include="$(MSBuildThisFileDirectory)..\runtimes\win-x86\native\Winook.Lib.Keyboard.x86.dll" />
+    <WinookSupportBinary Include="$(MSBuildThisFileDirectory)..\runtimes\win-x86\native\Winook.Lib.Mouse.x86.dll" />
+    <WinookSupportBinary Include="$(MSBuildThisFileDirectory)..\runtimes\win-x64\native\Winook.Lib.Host.x64.exe" />
+    <WinookSupportBinary Include="$(MSBuildThisFileDirectory)..\runtimes\win-x64\native\Winook.Lib.Keyboard.x64.dll" />
+    <WinookSupportBinary Include="$(MSBuildThisFileDirectory)..\runtimes\win-x64\native\Winook.Lib.Mouse.x64.dll" />
+  </ItemGroup>
+
+  <Target Name="CopyWinookSupportBinaries" AfterTargets="Build" Condition="'$(WinookSupportBinariesImported)' == '' and '$(TargetDir)' != ''">
+    <Copy SourceFiles="@(WinookSupportBinary)"
+          DestinationFolder="$(TargetDir)winook.support\"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="CopyWinookSupportBinariesToPublish" AfterTargets="Publish" Condition="'$(WinookSupportBinariesImported)' == '' and '$(PublishDir)' != ''">
+    <Copy SourceFiles="@(WinookSupportBinary)"
+          DestinationFolder="$(PublishDir)winook.support\"
+          SkipUnchangedFiles="true" />
+  </Target>
+</Project>

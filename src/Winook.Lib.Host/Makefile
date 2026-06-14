@@ -2,6 +2,7 @@ CC = g++
 
 SYS = $(MSYSTEM)
 DUMPMACHINE = $(shell $(CC) -dumpmachine)
+MSYS2_SHELL = $(filter MINGW% UCRT% CLANG%,$(SYS))
 
 WARNS = -Wall
 
@@ -13,7 +14,17 @@ endif
 
 WINDRES = windres
 
-OBJECTS = obj/Host.o obj/Winook.Lib.Host.o
+OBJDIR = obj/$(DUMPMACHINE)
+OBJECTS = $(OBJDIR)/Host.o $(OBJDIR)/Winook.Lib.Host.o
+
+ifneq (,$(MSYS2_SHELL))
+ifneq ($(filter /%,$(CC)),)
+	CCENV = PATH="$(patsubst %/,%,$(dir $(CC))):$$PATH"
+endif
+ifneq ($(filter /%,$(WINDRES)),)
+	WINDRESENV = PATH="$(patsubst %/,%,$(dir $(WINDRES))):$$PATH"
+endif
+endif
 
 ifeq ($(DUMPMACHINE),x86_64-w64-mingw32) 
 	CFLAGS = -m64 -std=c++17 -I../Winook.Common -DWINVER=0x0603 -D_WIN32_WINNT=0x0603 -DUNICODE -D_UNICODE -DWINOOK64 -D_GLIBCXX_ASSERTIONS -O2 $(WARNS) -fmessage-length=0 -fasynchronous-unwind-tables
@@ -33,7 +44,7 @@ endif
 all: bin/$(EXE)
 
 clean:
-ifneq (,$(findstring MINGW,$(SYS)))
+ifneq (,$(MSYS2_SHELL))
 	@if [ -d "bin" ]; then rm -r bin; fi
 	@if [ -d "obj" ]; then rm -r obj; fi
 else
@@ -41,19 +52,18 @@ else
 	@if exist obj\* del /f /s /q obj 1>nul & rd /s /q obj
 endif
 
-bin obj:
-ifneq (,$(findstring MINGW,$(SYS)))
-	@if [ ! -d "bin" ]; then mkdir bin; fi
-	@if [ ! -d "obj" ]; then mkdir obj; fi
+bin obj $(OBJDIR):
+ifneq (,$(MSYS2_SHELL))
+	@if [ ! -d "$@" ]; then mkdir -p "$@"; fi
 else
 	@if not exist "$@" mkdir "$@"
 endif
 
-obj/Winook.Lib.Host.o: Winook.Lib.Host.rc
-	$(WINDRES) --language 0x0409 Winook.Lib.Host.rc -o obj/Winook.Lib.Host.o
+$(OBJDIR)/Winook.Lib.Host.o: Winook.Lib.Host.rc | $(OBJDIR)
+	$(WINDRESENV) $(WINDRES) --language 0x0409 Winook.Lib.Host.rc -o "$@"
 
-obj/%.o: %.cpp | obj
-	$(CC) $(CFLAGS) -c "$<" -o "$@"
+$(OBJDIR)/%.o: %.cpp | $(OBJDIR)
+	$(CCENV) $(CC) $(CFLAGS) -c "$<" -o "$@"
 
 bin/$(EXE): $(OBJECTS) | bin
-	$(CC) -o "$@" $(OBJECTS) $(LDFLAGS)
+	$(CCENV) $(CC) -o "$@" $(OBJECTS) $(LDFLAGS)

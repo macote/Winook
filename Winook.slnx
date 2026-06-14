@@ -1,0 +1,26 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitignore" />
+    <File Path=".gitmodules" />
+    <File Path="CHANGELOG.md" />
+    <File Path="LICENSE" />
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="src/Winook.Lib.Host/Winook.Lib.Host.vcxproj" Id="69306344-bd77-4af6-8890-bf001d8ea7ee">
+    <Platform Solution="*|Any CPU" Project="Win32" />
+    <Build Solution="*|Any CPU" Project="false" />
+  </Project>
+  <Project Path="src/Winook.Lib/Winook.Lib.vcxproj" Id="5fb052a8-82fa-46e9-a9df-078bf725a548">
+    <Platform Solution="*|Any CPU" Project="Win32" />
+    <Build Solution="*|Any CPU" Project="false" />
+  </Project>
+  <Project Path="src/Winook/Winook.csproj" />
+  <Project Path="test/Winook.Desktop.Core.Test/Winook.Desktop.Core.Test.csproj" />
+  <Project Path="test/Winook.Desktop.Test/Winook.Desktop.Test.csproj" />
+</Solution>
