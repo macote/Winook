@@ -1,133 +1,153 @@
 namespace Winook.Desktop.Test
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
     using System.Windows.Forms;
     using Winook;
 
     public partial class Form1 : Form
     {
+        private const int RecentMessageCapacity = 20;
+
+        private readonly List<string> _recentMessages = [];
+        private readonly object _recentMessagesLock = new();
         private MouseHook _mouseHook;
         private KeyboardHook _keyboardHook;
         private Process _process;
         private bool _mouseHookInstalled;
         private bool _keyboardHookInstalled;
+        private bool _mouseHookTransitioning;
+        private bool _keyboardHookTransitioning;
+        private int _recentMessagesUpdatePending;
+        private Label[] _recentMessageLabels;
 
         public Form1()
         {
             InitializeComponent();
+            DoubleBuffered = true;
+            _recentMessageLabels =
+            [
+                recentMessageLabel01,
+                recentMessageLabel02,
+                recentMessageLabel03,
+                recentMessageLabel04,
+                recentMessageLabel05,
+                recentMessageLabel06,
+                recentMessageLabel07,
+                recentMessageLabel08,
+                recentMessageLabel09,
+                recentMessageLabel10,
+                recentMessageLabel11,
+                recentMessageLabel12,
+                recentMessageLabel13,
+                recentMessageLabel14,
+                recentMessageLabel15,
+                recentMessageLabel16,
+                recentMessageLabel17,
+                recentMessageLabel18,
+                recentMessageLabel19,
+                recentMessageLabel20,
+            ];
+
             if (!Environment.Is64BitOperatingSystem)
             {
                 radio64bit.Enabled = false;
             }
         }
 
-        private async void mouseButton_Click(object sender, EventArgs e)
+        private async void MouseButton_Click(object sender, EventArgs e)
         {
-            if (!_mouseHookInstalled)
+            if (_mouseHookTransitioning)
             {
-                await EnsureTargetProcessAsync();
+                return;
+            }
 
-                if (ignoreMove.Checked)
+            _mouseHookTransitioning = true;
+            mouseButton.Enabled = false;
+
+            try
+            {
+                if (!_mouseHookInstalled)
                 {
-                    _mouseHook = new MouseHook(_process.Id, MouseMessageTypes.IgnoreMove);
+                    await EnsureTargetProcessAsync();
+
+                    _mouseHook?.Dispose();
+                    _mouseHook = new MouseHook(_process.Id, GetSelectedMouseMessageTypes());
+
+                    ignoreMove.Enabled = false;
+                    _mouseHook.MessageReceived += MouseHook_MessageReceived;
+                    mouseButton.Text = "Installing hook...";
+                    await _mouseHook.InstallAsync();
+                    _mouseHookInstalled = true;
+                    mouseButton.Text = "Mouse Unhook";
                 }
                 else
                 {
-                    _mouseHook = new MouseHook(_process.Id);
+                    _mouseHook.MessageReceived -= MouseHook_MessageReceived;
+                    _mouseHook.Uninstall();
+                    _mouseHookInstalled = false;
+                    mouseButton.Text = "Mouse Hook";
+                    ignoreMove.Enabled = true;
                 }
-
-                _mouseHook.MessageReceived += MouseHook_MessageReceived;
-                _mouseHook.LeftButtonUp += MouseHook_LeftButtonUp;
-                _mouseHook.AddHandler(MouseMessageCode.NCLeftButtonUp, MouseHook_NCLButtonUp);
-                _mouseHook.RemoveHandler(MouseMessageCode.NCLeftButtonUp, MouseHook_NCLButtonUp);
-                mouseButton.Text = "Installing hook...";
-                await _mouseHook.InstallAsync();
-                _mouseHookInstalled = true;
-                mouseButton.Text = "Mouse Unhook";
             }
-            else
+            finally
             {
-                _mouseHook.Uninstall();
-                _mouseHookInstalled = false;
-                mouseButton.Text = "Mouse Hook";
+                mouseButton.Enabled = true;
+                _mouseHookTransitioning = false;
             }
-        }
-
-        private void MouseHook_LeftButtonUp(object sender, MouseMessageEventArgs e)
-        {
-            testLabel.Invoke((MethodInvoker)delegate
-            {
-                testLabel.Text = $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; "
-                    + $"Modifiers: {e.Modifiers:x}; Delta: {e.Delta}; XButtons: {e.XButtons}";
-            });
         }
 
         private void MouseHook_MessageReceived(object sender, MouseMessageEventArgs e)
         {
-            mouseLabel.Invoke((MethodInvoker)delegate
-            {
-                mouseLabel.Text = $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; "
-                    + $"Modifiers: {e.Modifiers:x}; Delta: {e.Delta}; XButtons: {e.XButtons}";
-            });
+            AddRecentMessage("Mouse", FormatMouseMessage(e), e.SendTimestamp);
         }
 
-        private void MouseHook_NCLButtonUp(object sender, MouseMessageEventArgs e)
+        private async void KeyboardButton_Click(object sender, EventArgs e)
         {
-            testLabel.Invoke((MethodInvoker)delegate
+            if (_keyboardHookTransitioning)
             {
-                testLabel.Text = $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; "
-                    + $"Modifiers: {e.Modifiers:x}; Delta: {e.Delta}; XButtons: {e.XButtons}";
-            });
-        }
-
-        private async void keyboardButton_Click(object sender, EventArgs e)
-        {
-            if (!_keyboardHookInstalled)
-            {
-                await EnsureTargetProcessAsync();
-
-                _keyboardHook = new KeyboardHook(_process.Id);
-                _keyboardHook.MessageReceived += KeyboardHook_MessageReceived;
-                _keyboardHook.AddHandler(KeyCode.F, KeyboardHook_Test);
-                _keyboardHook.AddHandler(KeyCode.F, Modifiers.Shift, KeyboardHook_Test);
-                _keyboardHook.AddHandler(KeyCode.Y, Modifiers.ControlShift, KeyboardHook_Test);
-                _keyboardHook.AddHandler(KeyCode.U, Modifiers.Shift | Modifiers.RightControl, KeyboardHook_Test);
-                _keyboardHook.AddHandler(KeyCode.N, Modifiers.AltControlShift, KeyboardHook_Test);
-                _keyboardHook.AddHandler(KeyCode.T, KeyboardHook_Test);
-                keyboardButton.Text = "Installing hook...";
-                await _keyboardHook.InstallAsync();
-                _keyboardHookInstalled = true;
-                keyboardButton.Text = "Keyboard Unhook";
+                return;
             }
-            else
+
+            _keyboardHookTransitioning = true;
+            keyboardButton.Enabled = false;
+
+            try
             {
-                _keyboardHook.Uninstall();
-                _keyboardHookInstalled = false;
-                keyboardButton.Text = "Keyboard Hook";
+                if (!_keyboardHookInstalled)
+                {
+                    await EnsureTargetProcessAsync();
+
+                    _keyboardHook?.Dispose();
+                    _keyboardHook = new KeyboardHook(_process.Id);
+                    _keyboardHook.MessageReceived += KeyboardHook_MessageReceived;
+                    keyboardButton.Text = "Installing hook...";
+                    await _keyboardHook.InstallAsync();
+                    _keyboardHookInstalled = true;
+                    keyboardButton.Text = "Keyboard Unhook";
+                }
+                else
+                {
+                    _keyboardHook.MessageReceived -= KeyboardHook_MessageReceived;
+                    _keyboardHook.Uninstall();
+                    _keyboardHookInstalled = false;
+                    keyboardButton.Text = "Keyboard Hook";
+                }
+            }
+            finally
+            {
+                keyboardButton.Enabled = true;
+                _keyboardHookTransitioning = false;
             }
         }
 
         private void KeyboardHook_MessageReceived(object sender, KeyboardMessageEventArgs e)
         {
-            keyboardLabel.Invoke((MethodInvoker)delegate
-            {
-                keyboardLabel.Text = $"Code: {e.KeyValue}; Modifiers: {e.Modifiers}; Flags: {e.Flags:x} "
-                    + $"Shift: {e.Shift}; Control: {e.Control}; Alt: {e.Alt}; Direction: {e.Direction}";
-            });
-        }
-
-        private void KeyboardHook_Test(object sender, KeyboardMessageEventArgs e)
-        {
-            Debug.Write($"KeyboardHook_Test - Code: {e.KeyValue}; Modifiers: {e.Modifiers:x}; Flags: {e.Flags:x}; ");
-            Debug.WriteLine($"Shift: {e.Shift}; Control: {e.Control}; Alt: {e.Alt}; Direction: {e.Direction}");
-            testLabel.Invoke((MethodInvoker)delegate
-            {
-                testLabel.Text = $"Code: {e.KeyValue}; Modifiers: {e.Modifiers}; Flags: {e.Flags:x} "
-                    + $"Shift: {e.Shift}; Control: {e.Control}; Alt: {e.Alt}; Direction: {e.Direction}";
-            });
+            AddRecentMessage("Keyboard", FormatKeyboardMessage(e), e.SendTimestamp);
         }
 
         private async Task EnsureTargetProcessAsync()
@@ -155,7 +175,7 @@ namespace Winook.Desktop.Test
                 return;
             }
 
-            var replacementProcess = Process.GetProcessesByName("charmap")
+            var replacementProcess = (Process.GetProcessesByName("charmap")
                 .Where(process => !existingCharacterMapProcessIds.Contains(process.Id))
                 .Where(HasMainWindow)
                 .OrderByDescending(GetStartTime)
@@ -163,13 +183,7 @@ namespace Winook.Desktop.Test
                 ?? Process.GetProcessesByName("charmap")
                     .Where(HasMainWindow)
                     .OrderByDescending(GetStartTime)
-                    .FirstOrDefault();
-
-            if (replacementProcess == null)
-            {
-                throw new InvalidOperationException("Unable to find the Character Map process window to hook.");
-            }
-
+                    .FirstOrDefault()) ?? throw new InvalidOperationException("Unable to find the Character Map process window to hook.");
             if (startedProcess != replacementProcess)
             {
                 startedProcess?.Dispose();
@@ -207,5 +221,70 @@ namespace Winook.Desktop.Test
                 return DateTime.MinValue;
             }
         }
+
+        private void AddRecentMessage(string hookType, string message, DateTimeOffset sendTimestamp)
+        {
+            var receivedTimestamp = DateTimeOffset.Now;
+            var latency = sendTimestamp == default
+                ? "Latency: n/a"
+                : $"Latency: {(receivedTimestamp - sendTimestamp).TotalMilliseconds:0.0} ms";
+            var sent = sendTimestamp == default
+                ? "Sent: n/a"
+                : $"Sent: {sendTimestamp.ToLocalTime():HH:mm:ss.fff}";
+
+            lock (_recentMessagesLock)
+            {
+                _recentMessages.Insert(0, $"{receivedTimestamp:HH:mm:ss.fff} {hookType,-8} {sent}; {latency}; {message}");
+                if (_recentMessages.Count > RecentMessageCapacity)
+                {
+                    _recentMessages.RemoveAt(_recentMessages.Count - 1);
+                }
+            }
+
+            ScheduleRecentMessagesUpdate();
+        }
+
+        private void ScheduleRecentMessagesUpdate()
+        {
+            if (IsDisposed || !IsHandleCreated)
+            {
+                return;
+            }
+
+            if (Interlocked.Exchange(ref _recentMessagesUpdatePending, 1) == 0)
+            {
+                BeginInvoke((MethodInvoker)FlushRecentMessages);
+            }
+        }
+
+        private void FlushRecentMessages()
+        {
+            Interlocked.Exchange(ref _recentMessagesUpdatePending, 0);
+
+            string[] recentMessages;
+            lock (_recentMessagesLock)
+            {
+                recentMessages = [.. _recentMessages];
+            }
+
+            for (var i = 0; i < _recentMessageLabels.Length; i++)
+            {
+                _recentMessageLabels[i].Text = i < recentMessages.Length ? recentMessages[i] : string.Empty;
+            }
+        }
+
+        private static string FormatMouseMessage(MouseMessageEventArgs e)
+            => $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Modifiers: {e.Modifiers:x}; "
+                + $"Delta: {e.Delta}; XButtons: {e.XButtons}";
+
+        private static string FormatKeyboardMessage(KeyboardMessageEventArgs e)
+            => $"Code: {e.KeyValue}; Modifiers: {e.Modifiers:x}; Flags: {e.Flags:x}; "
+                + $"Shift: {e.Shift}; Control: {e.Control}; Alt: {e.Alt}; Direction: {e.Direction}";
+
+        private MouseMessageTypes GetSelectedMouseMessageTypes()
+        {
+            return ignoreMove.Checked ? MouseMessageTypes.IgnoreMove : MouseMessageTypes.All;
+        }
     }
+
 }

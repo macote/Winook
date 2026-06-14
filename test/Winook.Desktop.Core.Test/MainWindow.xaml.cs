@@ -1,4 +1,5 @@
 using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,6 +13,9 @@ namespace Winook.Desktop.Core.Test
     /// </summary>
     public partial class MainWindow : Window
     {
+        private const int RecentMessageCapacity = 20;
+
+        private readonly ObservableCollection<string> _recentMessages = [];
         private MouseHook _mouseHook;
         private KeyboardHook _keyboardHook;
         private Process _process;
@@ -21,13 +25,14 @@ namespace Winook.Desktop.Core.Test
         public MainWindow()
         {
             InitializeComponent();
+            recentMessagesItemsControl.ItemsSource = _recentMessages;
             if (!Environment.Is64BitOperatingSystem)
             {
                 radio64bit.IsEnabled = false;
             }
         }
 
-        private async void mouseButton_Click(object sender, RoutedEventArgs e)
+        private async void MouseButton_Click(object sender, RoutedEventArgs e)
         {
             if (!_mouseHookInstalled)
             {
@@ -45,9 +50,6 @@ namespace Winook.Desktop.Core.Test
 
                 ignoreMove.IsEnabled = false;
                 _mouseHook.MessageReceived += MouseHook_MessageReceived;
-                _mouseHook.LeftButtonUp += MouseHook_LeftButtonUp;
-                _mouseHook.AddHandler(MouseMessageCode.NCLeftButtonUp, MouseHook_NCLButtonUp);
-                _mouseHook.RemoveHandler(MouseMessageCode.NCLeftButtonUp, MouseHook_NCLButtonUp);
                 mouseButton.Content = "Installing hook...";
                 await _mouseHook.InstallAsync();
                 _mouseHookInstalled = true;
@@ -58,37 +60,19 @@ namespace Winook.Desktop.Core.Test
                 _mouseHook.Uninstall();
                 _mouseHookInstalled = false;
                 mouseButton.Content = "Mouse Hook";
+                ignoreMove.IsEnabled = true;
             }
-        }
-
-        private void MouseHook_LeftButtonUp(object sender, MouseMessageEventArgs e)
-        {
-            testLabel.Dispatcher.BeginInvoke(new Action(() =>
-            {
-                testLabel.Content = $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; "
-                    + $"Modifiers: {e.Modifiers:x}; Delta: {e.Delta}; XButtons: {e.XButtons}";
-            }));
         }
 
         private void MouseHook_MessageReceived(object sender, MouseMessageEventArgs e)
         {
-            mouseLabel.Dispatcher.BeginInvoke(new Action(() =>
+            Dispatcher.BeginInvoke(new Action(() =>
             {
-                mouseLabel.Content = $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; "
-                    + $"Modifiers: {e.Modifiers:x}; Delta: {e.Delta}; XButtons: {e.XButtons}";
+                AddRecentMessage("Mouse", FormatMouseMessage(e), e.SendTimestamp);
             }));
         }
 
-        private void MouseHook_NCLButtonUp(object sender, MouseMessageEventArgs e)
-        {
-            testLabel.Dispatcher.BeginInvoke(new Action(() =>
-            {
-                testLabel.Content = $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; "
-                    + $"Modifiers: {e.Modifiers:x}; Delta: {e.Delta}; XButtons: {e.XButtons}";
-            }));
-        }
-
-        private async void keyboardButton_Click(object sender, EventArgs e)
+        private async void KeyboardButton_Click(object sender, EventArgs e)
         {
             if (!_keyboardHookInstalled)
             {
@@ -97,12 +81,6 @@ namespace Winook.Desktop.Core.Test
                 _keyboardHook?.Dispose();
                 _keyboardHook = new KeyboardHook(_process.Id);
                 _keyboardHook.MessageReceived += KeyboardHook_MessageReceived;
-                _keyboardHook.AddHandler(KeyCode.F, KeyboardHook_Test);
-                _keyboardHook.AddHandler(KeyCode.F, Modifiers.Shift, KeyboardHook_Test);
-                _keyboardHook.AddHandler(KeyCode.Y, Modifiers.ControlShift, KeyboardHook_Test);
-                _keyboardHook.AddHandler(KeyCode.U, Modifiers.Shift | Modifiers.RightControl, KeyboardHook_Test);
-                _keyboardHook.AddHandler(KeyCode.N, Modifiers.AltControlShift, KeyboardHook_Test);
-                _keyboardHook.AddHandler(KeyCode.T, KeyboardHook_Test);
                 keyboardButton.Content = "Installing hook...";
                 await _keyboardHook.InstallAsync();
                 _keyboardHookInstalled = true;
@@ -118,23 +96,36 @@ namespace Winook.Desktop.Core.Test
 
         private void KeyboardHook_MessageReceived(object sender, KeyboardMessageEventArgs e)
         {
-            keyboardLabel.Dispatcher.BeginInvoke(new Action(() =>
+            Dispatcher.BeginInvoke(new Action(() =>
             {
-                keyboardLabel.Content = $"Code: {e.KeyValue}; Modifiers: {e.Modifiers}; Flags: {e.Flags:x} "
-                    + $"Shift: {e.Shift}; Control: {e.Control}; Alt: {e.Alt}; Direction: {e.Direction}";
+                AddRecentMessage("Keyboard", FormatKeyboardMessage(e), e.SendTimestamp);
             }));
         }
 
-        private void KeyboardHook_Test(object sender, KeyboardMessageEventArgs e)
+        private void AddRecentMessage(string hookType, string message, DateTimeOffset sendTimestamp)
         {
-            Debug.Write($"KeyboardHook_Test - Code: {e.KeyValue}; Modifiers: {e.Modifiers:x}; Flags: {e.Flags:x}; ");
-            Debug.WriteLine($"Shift: {e.Shift}; Control: {e.Control}; Alt: {e.Alt}; Direction: {e.Direction}");
-            testLabel.Dispatcher.BeginInvoke(new Action(() =>
+            var receivedTimestamp = DateTimeOffset.Now;
+            var latency = sendTimestamp == default
+                ? "Latency: n/a"
+                : $"Latency: {(receivedTimestamp - sendTimestamp).TotalMilliseconds:0.0} ms";
+            var sent = sendTimestamp == default
+                ? "Sent: n/a"
+                : $"Sent: {sendTimestamp.ToLocalTime():HH:mm:ss.fff}";
+
+            _recentMessages.Insert(0, $"{receivedTimestamp:HH:mm:ss.fff} {hookType,-8} {sent}; {latency}; {message}");
+            if (_recentMessages.Count > RecentMessageCapacity)
             {
-                testLabel.Content = $"Code: {e.KeyValue}; Modifiers: {e.Modifiers}; Flags: {e.Flags:x} "
-                    + $"Shift: {e.Shift}; Control: {e.Control}; Alt: {e.Alt}; Direction: {e.Direction}";
-            }));
+                _recentMessages.RemoveAt(_recentMessages.Count - 1);
+            }
         }
+
+        private static string FormatMouseMessage(MouseMessageEventArgs e)
+            => $"Code: {e.MessageCode}; X: {e.X}; Y: {e.Y}; Modifiers: {e.Modifiers:x}; "
+                + $"Delta: {e.Delta}; XButtons: {e.XButtons}";
+
+        private static string FormatKeyboardMessage(KeyboardMessageEventArgs e)
+            => $"Code: {e.KeyValue}; Modifiers: {e.Modifiers:x}; Flags: {e.Flags:x}; "
+                + $"Shift: {e.Shift}; Control: {e.Control}; Alt: {e.Alt}; Direction: {e.Direction}";
 
         private async Task EnsureTargetProcessAsync()
         {
@@ -161,7 +152,7 @@ namespace Winook.Desktop.Core.Test
                 return;
             }
 
-            var replacementProcess = Process.GetProcessesByName("charmap")
+            var replacementProcess = (Process.GetProcessesByName("charmap")
                 .Where(process => !existingCharacterMapProcessIds.Contains(process.Id))
                 .Where(HasMainWindow)
                 .OrderByDescending(GetStartTime)
@@ -169,13 +160,7 @@ namespace Winook.Desktop.Core.Test
                 ?? Process.GetProcessesByName("charmap")
                     .Where(HasMainWindow)
                     .OrderByDescending(GetStartTime)
-                    .FirstOrDefault();
-
-            if (replacementProcess == null)
-            {
-                throw new InvalidOperationException("Unable to find the Character Map process window to hook.");
-            }
-
+                    .FirstOrDefault()) ?? throw new InvalidOperationException("Unable to find the Character Map process window to hook.");
             if (startedProcess != replacementProcess)
             {
                 startedProcess?.Dispose();

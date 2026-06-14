@@ -5,15 +5,34 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Winook.Desktop.Core.Test"
         mc:Ignorable="d"
-        Title="MainWindow" Height="250" Width="600">
-    <Grid>
-        <Button x:Name="mouseButton" Content="Mouse Hook" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="mouseButton_Click" Width="150" Height="25"/>
-        <CheckBox x:Name="ignoreMove" Content="Ignore move messages" HorizontalAlignment="Left" Margin="10,40,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="keyboardButton" Content="Keyboard Hook" HorizontalAlignment="Left" Margin="10,60,0,0" VerticalAlignment="Top" Click="keyboardButton_Click" Width="150" Height="25"/>
-        <RadioButton x:Name="radio32bit" Content="32-bit" HorizontalAlignment="Left" Margin="10,90,0,0" VerticalAlignment="Top" IsChecked="True" Width="54"/>
-        <RadioButton x:Name="radio64bit" Content="64-bit" HorizontalAlignment="Left" Margin="67,90,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="mouseLabel" Content="Mouse messages" HorizontalAlignment="Center" Margin="0,110,0,0" VerticalAlignment="Top" Width="580"/>
-        <Label x:Name="keyboardLabel" Content="Keyboard messages" HorizontalAlignment="Center" Margin="0,141,0,0" VerticalAlignment="Top" Width="580"/>
-        <Label x:Name="testLabel" Content="Test messages" HorizontalAlignment="Center" Margin="0,172,0,0" VerticalAlignment="Top" Width="580"/>
+        Title="MainWindow" Height="614" Width="900">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Vertical">
+            <StackPanel Orientation="Horizontal">
+                <Button x:Name="mouseButton" Content="Mouse Hook" Click="MouseButton_Click" Width="150" Height="25"/>
+                <CheckBox x:Name="ignoreMove" Content="Ignore move messages" Margin="12,4,0,0"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                <Button x:Name="keyboardButton" Content="Keyboard Hook" Click="KeyboardButton_Click" Width="150" Height="25"/>
+                <RadioButton x:Name="radio32bit" Content="32-bit" Margin="12,4,0,0" IsChecked="True"/>
+                <RadioButton x:Name="radio64bit" Content="64-bit" Margin="12,4,0,0"/>
+            </StackPanel>
+        </StackPanel>
+
+        <GroupBox Grid.Row="2" Header="Messages">
+            <ItemsControl x:Name="recentMessagesItemsControl">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" TextTrimming="CharacterEllipsis" Height="24"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </GroupBox>
     </Grid>
 </Window>
