@@ -1,5 +1,27 @@
 # Changelog
 
+## 1.4.0 (2026-06-14)
+
+### Breaking
+
+- Make `MessageReceiver` internal. This type was implementation detail for native hook message transport and is no longer part of the public API.
+
+### Added
+
+- Add send timestamps to mouse and keyboard message event args.
+
+### Changed
+
+- Remove the native asio dependency and replace TCP message transport with named pipes.
+- Package native support binaries under runtime native asset folders and copy them through build targets.
+- Add NuGet package deployment and smoke test scripts.
+- Add a NuGet package readme.
+- Update desktop test diagnostics with message latency and recent message lists.
+
+### Fixed
+
+- Fix native hook teardown so hooks are uninstalled reliably without blocking DLL unload.
+
 ## 1.3.2 (2021-05-08)
 
 ### Fixed
